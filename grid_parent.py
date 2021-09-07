@@ -47,8 +47,6 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width):
         # Get the densities of the particles in this cell
         poss = hdf["/PartType1/Coordinates"][my_offset: my_offset + my_count]
 
-        this_pos = poss[ipart, :]
-
         i = np.int32(poss[:, 0] / cell_width)
         j = np.int32(poss[:, 1] / cell_width)
         k = np.int32(poss[:, 2] / cell_width)
