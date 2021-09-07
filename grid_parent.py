@@ -2,9 +2,8 @@ import numpy as np
 import h5py
 
 
-# filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" \
-#            "DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000.hdf5"
-filepath = "/Users/willroper/Documents/3D Printing/Python/ani_hydro_1379.hdf5"
+filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" \
+           "DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000.hdf5"
 
 # Open HDF5 file
 hdf = h5py.File(filepath, "r")
@@ -59,6 +58,5 @@ hdf.close()
 # Convert mass grid to overdensities
 ovden_grid = mass_grid / cell_width * 10**10
 
-print(ovden_grid)
-print(ovden_grid.min(), ovden_grid.max())
+
 
