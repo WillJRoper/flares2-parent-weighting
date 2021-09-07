@@ -18,7 +18,7 @@ source activate flares-env
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
 # Run the program
-./grid_parent_distributed.py $i 500
+python grid_parent_distributed.py $i 500
 
 source deactivate
 
