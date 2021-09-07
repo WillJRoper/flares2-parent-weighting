@@ -43,7 +43,6 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     cell_bins = np.linspace(0, nr_cells, njobs + 1, dtype=int)
     my_cells = np.arange(cell_bins[jobid], cell_bins[jobid + 1], 1, dtype=int)
-    print(my_cells)
 
     for icell in my_cells:
 
@@ -87,12 +86,10 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     zoom_grp.attrs["zoom_width"] = zoom_width
     zoom_grp.attrs["cell_width"] = cell_width
     zoom_grp.create_dataset("Mass_grid", data=mass_grid)
-    # zoom_grp.create_dataset("Density_grid", data=den_grid)
-    # zoom_grp.create_dataset("Overdensity_grid", data=ovden_grid)
 
     hdf.close()
 
-njobs = 100
+njobs = int(sys.argv[2])
 jobid = int(sys.argv[1])
 
 zoom_width = 25

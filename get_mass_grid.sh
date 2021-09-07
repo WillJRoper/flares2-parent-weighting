@@ -1,6 +1,6 @@
 #!/bin/bash -l
 #SBATCH --ntasks 1 # The number of cores you need...
-#SBATCH --array=1-100
+#SBATCH --array=1-500
 #SBATCH -p cosma6 #or some other partition, e.g. cosma, cosma6, etc.
 #SBATCH -A dp004
 #SBATCH --cpus-per-task=1
@@ -18,7 +18,7 @@ source activate flares-env
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
 # Run the program
-./grid_parent_distributed.py $i
+./grid_parent_distributed.py $i 500
 
 source deactivate
 

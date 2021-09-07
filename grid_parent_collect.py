@@ -82,7 +82,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs):
 
     hdf.close()
 
-njobs = 100
+njobs = 500
 zoom_width = 25
 for zoom_ncells in [16, 32, 64, 128, 256]:
     print("================== zoom width, zoom_ncells =",
