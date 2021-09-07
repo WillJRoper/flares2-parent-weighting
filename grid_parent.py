@@ -36,13 +36,17 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width):
     print("nr_cells:", nr_cells)
     print("grid cells:", ncells)
 
+    # Retrieve the offset and counts
+    offsets = hdf["/Cells/OffsetsInFile/PartType1"][:]
+    counts = hdf["/Cells/Counts/PartType1"][:]
+
     for icell in range(nr_cells):
 
         print(icell, "of", nr_cells)
 
         # Retrieve the offset and counts
-        my_offset = hdf["/Cells/OffsetsInFile/PartType1"][icell]
-        my_count = hdf["/Cells/Counts/PartType1"][icell]
+        my_offset = offsets[icell]
+        my_count = counts[icell]
 
         # Get the densities of the particles in this cell
         poss = hdf["/PartType1/Coordinates"][my_offset: my_offset + my_count]
