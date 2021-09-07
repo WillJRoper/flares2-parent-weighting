@@ -9,6 +9,8 @@
 #SBATCH -e logs/error_hlr_job.%A_%a.err
 #SBATCH -t 72:00:00
 
+cd /cosma/home/dp004/dc-rope1/FLARES/FLARES-2-codes/flares2-parent-weighting
+
 module purge
 #load the modules used to build your program.
 module load pythonconda3/4.5.4
