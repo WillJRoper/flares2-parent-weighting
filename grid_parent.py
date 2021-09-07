@@ -5,7 +5,7 @@ import sys
 
 filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000.hdf5"
 
-def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
+def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width):
 
     # Open HDF5 file
     hdf = h5py.File(filepath, "r")
@@ -40,10 +40,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     print("nr_cells:", nr_cells)
     print("grid cells:", ncells)
 
-    cell_bins = np.linspace(0, nr_cells, njobs + 1, dtype=int)
-    my_cells = np.arange(cell_bins[jobid], cell_bins[jobid + 1], 1, dtype=int)
-    print(len(my_cells))
-    for icell in my_cells:
+    for icell in range(nr_cells):
 
         # Retrieve the offset and counts
         my_offset = offsets[icell]
@@ -60,16 +57,16 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     hdf.close()
 
-    # # Convert mass grid to overdensities
-    # den_grid = mass_grid / cell_volume
-    # ovden_grid = (den_grid - mean_density) / mean_density
+    # Convert mass grid to overdensities
+    den_grid = mass_grid / cell_volume
+    ovden_grid = (den_grid - mean_density) / mean_density
 
     try:
-        hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5", "r+")
+        hdf = h5py.File("data/parent_ovden_grid.hdf5", "r+")
         grid_grp = hdf["Grids"]
     except OSError as e:
         print(e)
-        hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5", "w")
+        hdf = h5py.File("data/parent_ovden_grid.hdf5", "w")
         grid_grp = hdf.create_group("Grids")
 
     try:
@@ -85,17 +82,16 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     zoom_grp.attrs["zoom_width"] = zoom_width
     zoom_grp.attrs["cell_width"] = cell_width
     zoom_grp.create_dataset("Mass_grid", data=mass_grid)
+    zoom_grp.create_dataset("Density_grid", data=den_grid)
+    zoom_grp.create_dataset("Overdensity_grid", data=ovden_grid)
 
     hdf.close()
-
-njobs = int(sys.argv[2])
-jobid = int(sys.argv[1])
 
 zoom_width = 25
 for zoom_ncells in [16, 32, 64, 128, 256]:
     print("================== zoom width, zoom_ncells =",
           zoom_width, zoom_ncells, "==================")
-    get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid)
+    get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width)
 
 
 
