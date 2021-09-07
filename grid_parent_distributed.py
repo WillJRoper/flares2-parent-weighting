@@ -43,6 +43,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     cell_bins = np.linspace(0, nr_cells, njobs + 1)
     my_cells = np.arange(cell_bins[jobid], cell_bins[jobid + 1], 1)
+    print(my_cells)
 
     for icell in my_cells:
 
