@@ -28,6 +28,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     centres = hdf["/Cells/Centres"][:, :]
 
     # Set up overdensity grid array
+    zoom_width = np.array([zoom_width, zoom_width, zoom_width])
     cell_width = zoom_width / zoom_ncells
     ncells = np.int32(boxsize / cell_width)
 
@@ -72,7 +73,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         # Retrieve the offset and counts
         my_offset = offsets[icell]
         my_count = counts[icell]
-        my_cent = centres[icell]
+        my_cent = centres[icell, :]
         loc = my_cent - (sim_cell_width / 2)
 
         mass_grid = np.zeros(my_ncells)
@@ -89,6 +90,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         i = np.int32((poss[:, 0] - loc[0]) / cell_width)
         j = np.int32((poss[:, 1] - loc[1]) / cell_width)
         k = np.int32((poss[:, 2] - loc[2]) / cell_width)
+        
+        print(loc, my_cent, sim_cell_width / 2)
 
         mass_grid[i, j, k] += dm_mass
 
