@@ -24,8 +24,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     half_sim_cell_width = sim_cell_width / 2.
 
     # Retrieve the offset and counts
-    offsets = hdf["/Cells/OffsetsInFile/PartType1"][:]
-    counts = hdf["/Cells/Counts/PartType1"][:]
+    # offsets = hdf["/Cells/OffsetsInFile/PartType1"][:]
+    # counts = hdf["/Cells/Counts/PartType1"][:]
     centres = hdf["/Cells/Centres"][:, :]
 
     # Set up overdensity grid array
@@ -72,8 +72,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         print(i, "(", icell, ")", "of", my_ncells, "(", ncells, ")")
 
         # Retrieve the offset and counts
-        my_offset = offsets[icell]
-        my_count = counts[icell]
+        my_offset = hdf["/Cells/OffsetsInFile/PartType1"][icell]
+        my_count = hdf["/Cells/Counts/PartType1"][icell]
         my_cent = centres[icell, :]
         loc = my_cent - half_sim_cell_width
 
