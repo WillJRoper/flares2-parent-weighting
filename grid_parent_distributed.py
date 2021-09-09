@@ -3,8 +3,8 @@ import h5py
 import sys
 
 
-# filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000.hdf5"
-filepath = "/Users/willroper/Documents/3D Printing/Python/ani_hydro_1379.hdf5"
+filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000.hdf5"
+# filepath = "/Users/willroper/Documents/3D Printing/Python/ani_hydro_1379.hdf5"
 
 def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
