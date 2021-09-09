@@ -44,20 +44,20 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     print("Sim cell grid cells:", my_ncells)
 
     try:
-        hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
+        grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
                         "r+")
     except OSError as e:
         print(e)
-        hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
+        grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
                         "w")
 
     try:
-        zoom_grp = hdf.create_group(str(zoom_width) + "_"
+        zoom_grp = grid_hdf.create_group(str(zoom_width) + "_"
                                     + str(zoom_ncells))
     except OSError as e:
         print(e)
-        del hdf[str(zoom_width) + "_" + str(zoom_ncells)]
-        zoom_grp = hdf.create_group(str(zoom_width) + "_"
+        del grid_hdf[str(zoom_width) + "_" + str(zoom_ncells)]
+        zoom_grp = grid_hdf.create_group(str(zoom_width) + "_"
                                     + str(zoom_ncells))
 
     zoom_grp.attrs["zoom_ncells"] = zoom_ncells
@@ -97,12 +97,11 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         i += 1
 
     hdf.close()
+    grid_hdf.close()
 
     # # Convert mass grid to overdensities
     # den_grid = mass_grid / cell_volume
     # ovden_grid = (den_grid - mean_density) / mean_density
-
-    hdf.close()
 
 njobs = 10
 jobid = 0
