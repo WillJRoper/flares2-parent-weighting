@@ -87,10 +87,10 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         # Get the densities of the particles in this cell
         poss = hdf["/PartType1/Coordinates"][my_offset: my_offset + my_count]
 
-        i = np.int32((poss[:, 0] - loc[0]) / cell_width)
-        j = np.int32((poss[:, 1] - loc[1]) / cell_width)
-        k = np.int32((poss[:, 2] - loc[2]) / cell_width)
-        
+        i = np.int32((poss[:, 0] - loc[0]) / cell_width[0])
+        j = np.int32((poss[:, 1] - loc[1]) / cell_width[1])
+        k = np.int32((poss[:, 2] - loc[2]) / cell_width[2])
+
         print(loc, my_cent, sim_cell_width / 2)
 
         mass_grid[i, j, k] += dm_mass
