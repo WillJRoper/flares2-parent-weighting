@@ -103,8 +103,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     # den_grid = mass_grid / cell_volume
     # ovden_grid = (den_grid - mean_density) / mean_density
 
-njobs = 10
-jobid = 0
+njobs = int(sys.argv[2])
+jobid = int(sys.argv[1])
 
 zoom_width = 25
 for zoom_ncells in [16, 32, 64, 128, 256]:
