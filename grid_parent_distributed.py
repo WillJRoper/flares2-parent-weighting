@@ -91,7 +91,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         j = np.int32((poss[:, 1] - loc[1]) / cell_width[1])
         k = np.int32((poss[:, 2] - loc[2]) / cell_width[2])
 
-        print(loc, my_cent, sim_cell_width / 2)
+        print(poss[0, :], loc, my_cent, sim_cell_width / 2)
 
         mass_grid[i, j, k] += dm_mass
 
