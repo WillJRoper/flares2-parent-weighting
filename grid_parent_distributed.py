@@ -20,7 +20,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     # Read in the cell centres and size
     nr_cells = int(hdf["/Cells/Meta-data"].attrs["nr_cells"])
-    sim_cell_width = boxsize / hdf["/Cells/Meta-data"].attrs["dimension"]
+    sim_cell_width = hdf["/Cells/Meta-data"].attrs["size"]
+    half_sim_cell_width = sim_cell_width / 2.
 
     # Retrieve the offset and counts
     offsets = hdf["/Cells/OffsetsInFile/PartType1"][:]
@@ -74,7 +75,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         my_offset = offsets[icell]
         my_count = counts[icell]
         my_cent = centres[icell, :]
-        loc = my_cent - (sim_cell_width / 2)
+        loc = my_cent - half_sim_cell_width
 
         mass_grid = np.zeros(my_ncells)
 
@@ -91,7 +92,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         j = np.int32((poss[:, 1] - loc[1]) / cell_width[1])
         k = np.int32((poss[:, 2] - loc[2]) / cell_width[2])
 
-        print(poss[0, :], loc, my_cent, sim_cell_width / 2)
+        print(poss[0, :], poss[0, :] - loc)
+        print(loc, my_cent, half_sim_cell_width)
 
         mass_grid[i, j, k] += dm_mass
 
