@@ -38,7 +38,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         cell_bins = np.linspace(0, nr_cells, njobs + 1, dtype=int)
         my_cells = np.arange(cell_bins[jobid], cell_bins[jobid + 1], 1, dtype=int)
         my_ncells = np.int32(np.ceil(sim_cell_width / cell_width))
-
+        print(centres.shape)
         print("N_part:", nparts)
         print("Boxsize:", boxsize)
         print("Redshift:", z)
