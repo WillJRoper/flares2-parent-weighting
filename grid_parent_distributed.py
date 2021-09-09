@@ -66,7 +66,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     i = 0
     for icell in my_cells:
 
-        print(i, "(", icell, ")", "of", my_ncells, "(" + ncells + ")")
+        print(i, "(", icell, ")", "of", my_ncells, "(", ncells, ")")
 
         # Retrieve the offset and counts
         my_offset = offsets[icell]
