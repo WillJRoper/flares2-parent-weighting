@@ -20,7 +20,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     # Read in the cell centres and size
     nr_cells = int(hdf["/Cells/Meta-data"].attrs["nr_cells"])
-    sim_cell_width = hdf["/Cells/Meta-data"].attrs["size"]
+    sim_cell_width = boxsize / hdf["/Cells/Meta-data"].attrs["dimension"]
 
     # Retrieve the offset and counts
     offsets = hdf["/Cells/OffsetsInFile/PartType1"][:]
@@ -38,8 +38,9 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
     print("N_part:", nparts)
     print("Boxsize:", boxsize)
     print("Redshift:", z)
-    print("Cell Width:", cell_width)
-    print("nr_cells:", nr_cells)
+    print("Sim Cell Width:", sim_cell_width)
+    print("Grid Cell Width:", cell_width)
+    print("Sim nr_cells:", nr_cells)
     print("Total grid cells:", ncells)
     print("Sim cell grid cells:", my_ncells)
 
