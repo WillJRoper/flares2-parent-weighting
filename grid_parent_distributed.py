@@ -29,7 +29,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
         cell_width = zoom_width / zoom_ncells
         ncells = np.int32(boxsize / cell_width)
 
-        bins = np.linspace(0, nparts_this_file, 2, dtype=int)
+        bins = np.linspace(0, nparts_this_file, 10, dtype=int)
         print("N_part:", nparts)
         print("NpartThisFile:", nparts_this_file)
         print("Boxsize:", boxsize)
