@@ -22,7 +22,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         boxsize = hdf["Header"].attrs["BoxSize"]
         z = hdf["Header"].attrs["Redshift"]
         nparts = hdf["Header"].attrs["NumPart_Total"]
-        nparts_this_file = hdf["Header"].attrs["NumPart_ThisFile"]
+        nparts_this_file = hdf["Header"].attrs["NumPart_ThisFile"][1]
 
         # Set up overdensity grid array
         zoom_width = np.array([zoom_width, zoom_width, zoom_width])
