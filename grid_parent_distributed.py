@@ -29,7 +29,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
         cell_width = zoom_width / zoom_ncells
         ncells = np.int32(boxsize / cell_width)
 
-        bins = np.linspace(0, nparts_this_file, 10, dtype=int)
+        bins = np.linspace(0, nparts_this_file, 20, dtype=int)
         print("N_part:", nparts)
         print("NpartThisFile:", nparts_this_file)
         print("Boxsize:", boxsize)
@@ -39,21 +39,16 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
 
         grid_poss = np.zeros((nparts_this_file, 3), dtype=int)
 
-        for ibin in range(len(bins[:-1])):
+        # Get the densities of the particles in this cell
+        poss = hdf["/PartType1/Coordinates"][:, :]
 
-            print(ibin * (bins[ibin + 1] - bins[ibin]),
-                  "of", nparts_this_file)
+        i = np.int32(poss[:, 0] / cell_width[0])
+        j = np.int32(poss[:, 1] / cell_width[1])
+        k = np.int32(poss[:, 2] / cell_width[2])
 
-            # Get the densities of the particles in this cell
-            poss = hdf["/PartType1/Coordinates"][bins[ibin]: bins[ibin + 1], :]
-
-            i = np.int32(poss[:, 0] / cell_width[0])
-            j = np.int32(poss[:, 1] / cell_width[1])
-            k = np.int32(poss[:, 2] / cell_width[2])
-
-            grid_poss[bins[ibin]: bins[ibin + 1], 0] = i
-            grid_poss[bins[ibin]: bins[ibin + 1], 1] = j
-            grid_poss[bins[ibin]: bins[ibin + 1], 2] = k
+        grid_poss[:, 0] = i
+        grid_poss[:, 1] = j
+        grid_poss[:, 2] = k
 
         hdf.close()
 
