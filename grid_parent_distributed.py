@@ -1,6 +1,7 @@
 import numpy as np
 import h5py
 import sys
+import time
 
 
 filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000."
@@ -73,14 +74,19 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
                                 compression="gzip")
         grid_hdf.close()
 
+tot_start = time.time()
 njobs = int(sys.argv[2])
 jobid = int(sys.argv[1])
 
 zoom_width = 25
 for zoom_ncells in [16, 32, 64, 128, 256]:
+    start = time.time()
     print("================== zoom width, zoom_ncells =",
           zoom_width, zoom_ncells, "==================")
     get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid)
+    print("Iteration took:", time.time() - start)
+
+print("Total:", time.time() - tot_start)
 
 
 

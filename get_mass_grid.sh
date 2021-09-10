@@ -1,6 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks 1 # The number of cores you need...
-#SBATCH --array=1-100%4
+#SBATCH --array=1-300%4
+#SBATCH --ntasks-per-node=96
 #SBATCH -p cosma8 #or some other partition, e.g. cosma, cosma6, etc.
 #SBATCH -A dp004
 #SBATCH --cpus-per-task=1
