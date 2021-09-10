@@ -6,7 +6,7 @@ import sys
 filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000."
 # filepath = "/Users/willroper/Documents/3D Printing/Python/ani_hydro_1379.hdf5"
 
-def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
+def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
 
     total_jobs = 1199
     job_bins = np.linspace(0, total_jobs, njobs, dtype=int)
@@ -25,7 +25,7 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         nparts_this_file = hdf["Header"].attrs["NumPart_ThisFile"][1]
 
         # Set up overdensity grid array
-        zoom_width = np.array([zoom_width, zoom_width, zoom_width])
+        zoom_width = np.array([izoom_width, izoom_width, izoom_width])
         cell_width = zoom_width / zoom_ncells
         ncells = np.int32(boxsize / cell_width)
 
@@ -41,7 +41,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
         for ibin in range(len(bins[:-1])):
 
-            print(ibin, "of", nparts_this_file)
+            print(ibin * (bins[ibin + 1] - bins[ibin]),
+                  "of", nparts_this_file)
 
             # Get the densities of the particles in this cell
             poss = hdf["/PartType1/Coordinates"][bins[ibin]: bins[ibin + 1], :]
@@ -57,11 +58,13 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
         hdf.close()
 
         try:
-            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
+            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + "_"
+                                 + str(ifile) + ".hdf5",
                             "r+")
         except OSError as e:
             print(e)
-            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + ".hdf5",
+            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + "_"
+                                 + str(ifile) + ".hdf5",
                             "w")
         try:
             zoom_grp = grid_hdf.create_group(str(zoom_width) + "_"
