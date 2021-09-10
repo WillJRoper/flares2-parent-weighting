@@ -10,6 +10,8 @@ def get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid):
 
     total_jobs = 1199
     job_bins = np.linspace(0, total_jobs, njobs, dtype=int)
+    print(str(jobid) + ":", "I have files",
+          job_bins[jobid], "-", job_bins[jobid + 1])
 
     for ifile in range(job_bins[jobid], job_bins[jobid + 1]):
 
