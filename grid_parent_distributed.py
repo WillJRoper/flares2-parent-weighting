@@ -143,12 +143,16 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     hdf.close()
 
 
-def create_meta_file(metapath, ini_rankpath, size):
+def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
+
+    # Change to the data directory to ensure relative paths work
+    os.chdir(rankfile_dir)
 
     # Write the metadata from rank 0 file to meta file
-    rank0path = ini_rankpath + "_rank%s.hdf5" % "0".zfill(4)  # get rank 0 file
-    hdf_rank0 = h5py.File(rank0path, "r")  # open rank 0 file
-    hdf_meta = h5py.File(metapath, "w")  # create meta file
+    rank0file = (outfile_without_rank
+                 + "rank%s.hdf5" % "0".zfill(4))  # get rank 0 file
+    hdf_rank0 = h5py.File(rank0file, "r")  # open rank 0 file
+    hdf_meta = h5py.File(metafile, "w")  # create meta file
     for root_key in ["Parent", "Delta_grid"]:  # loop over root groups
         grp = hdf_meta.create_group(root_key)
         for key in hdf_rank0[root_key].attrs.keys():
@@ -160,14 +164,15 @@ def create_meta_file(metapath, ini_rankpath, size):
     for other_rank in range(size):
 
         # Get the path to this rank
-        rankpath = ini_rankpath + "_rank%s.hdf5" % str(other_rank).zfill(4)
+        rankfile = (outfile_without_rank
+                    + "rank%s.hdf5" % str(other_rank).zfill(4))
 
         # Open rankfile
         hdf_rank = h5py.File(rankpath, "r")
 
-        # Loop over groups creating external links
+        # Loop over groups creating external links with relative path
         for key in hdf_rank.keys():
-            hdf_meta[key] = h5py.ExternalLink(rankpath, key)
+            hdf_meta[key] = h5py.ExternalLink(rankfile, key)
 
         hdf_rank.close()
 
@@ -195,19 +200,18 @@ if __name__ == "__main__":
     outfile_without_rank = "overdensity_L2800N5040_HYDRO_snap%s_" % snap
 
     # Define output paths
-    ini_outpath = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+    out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
                   "overdensity_gridding/L2800N5040/HYDRO/snap_" + snap
-    if not os.path.isdir(ini_outpath):
-        os.mkdir(ini_outpath)
-    outpath = ini_outpath + "/" + outfile  # Combine file and path
-    ini_rankpath = ini_outpath + "/" + outfile_without_rank  # rankless string
-    metapath = ini_outpath + "/" + metafile
+    if not os.path.isdir(out_dir):
+        os.mkdir(out_dir)
+    outpath = out_dir + "/" + outfile  # Combine file and path
+    ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
     # Get the overdensity grid for this rank
     get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Create the meta file now we have each individual rank file
     if rank == 0:
-        create_meta_file(metapath, ini_rankpath, size)
+        create_meta_file(metafile, out_dir, outfile_without_rank, size)
 
 
