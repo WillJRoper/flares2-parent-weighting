@@ -123,6 +123,10 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             # Compute overdensity grid ijk references
             ovden_ijk = np.int32(poss / ovden_cell_width)
 
+            print(ovden_ijk[:, 0].min(), ovden_ijk[:, 0].max(),
+                  ovden_ijk[:, 1].min(), ovden_ijk[:, 1].max(),
+                  ovden_ijk[:, 2].min(), ovden_ijk[:, 2].max())
+
             # Store the mass in each grid cell
             ovden_grid_this_cell[ovden_ijk[:, 0],
                                  ovden_ijk[:, 1],
