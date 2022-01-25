@@ -96,6 +96,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     parent.attrs["Ncells_Total"] = full_grid_ncells
     parent.attrs["Ncells_PerSimCell"] = ovden_cdim
 
+    # Create cells group
+    cells_grp = hdf_out.create_group("Cells")
+
     # Loop over cells calculating the overdensity grid
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
@@ -137,7 +140,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             ovden_grid_this_cell /= mean_density  # normlised by mean density
 
         # Create a group for this cell
-        this_cell = hdf_out.create_group(str(i) + "_" + str(j) + "_" + str(k))
+        this_cell = cells_grp.create_group(str(i) + "_" + str(j)
+                                           + "_" + str(k))
         this_cell.attrs["Sim_Cell_Index"] = my_cell
         this_cell.attrs["Sim_Cell_Edges"] = my_edges
         this_cell.create_dataset("grid", data=ovden_grid_this_cell,
@@ -181,12 +185,10 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
         hdf_rank = h5py.File(rankfile, "r")
 
         # Loop over groups creating external links with relative path
-        for key in hdf_rank.keys():
-            if key in ["Parent", "Delta_grid"]:
-                continue
+        for key in hdf_rank["Cells"].keys():
             i, j, k = key.split("_")
             cid = get_cellid(cdim, int(i), int(j) , int(k))
-            hdf_meta[str(cid)] = h5py.ExternalLink(rankfile, key)
+            hdf_meta[str(cid)] = h5py.ExternalLink(rankfile, "/Cells/" + key)
 
         hdf_rank.close()
 
