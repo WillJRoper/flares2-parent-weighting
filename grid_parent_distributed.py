@@ -102,7 +102,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
         # Set up array to store this cells overdensity grid
-        ovden_grid_this_cell = np.zeros(ovden_cdim)
+        ovden_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
+                                         ovden_cdim[1] + 1,
+                                         ovden_cdim[2] + 1))
         print(ovden_grid_this_cell.shape)
 
         # Retrieve the offset and counts for this cell
