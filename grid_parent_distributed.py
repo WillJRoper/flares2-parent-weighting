@@ -177,8 +177,6 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
         rankfile = (outfile_without_rank
                     + "rank%s.hdf5" % str(other_rank).zfill(4))
 
-        print("Linking", rankfile)
-
         # Open rankfile
         hdf_rank = h5py.File(rankfile, "r")
 
@@ -219,8 +217,8 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # # Get the overdensity grid for this rank
-    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    # Get the overdensity grid for this rank
+    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Create the meta file now we have each individual rank file
     if rank == 0:
