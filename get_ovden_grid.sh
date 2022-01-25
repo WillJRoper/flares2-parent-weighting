@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks 128
 #SBATCH -N 1
-#SBATCH --array=1-480%40
+#SBATCH --array=1-20%1
 #SBATCH -J FLARES2-OVDEN-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040.%J.out
 #SBATCH -e logs/L2800N5040.%J.err
