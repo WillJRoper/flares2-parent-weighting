@@ -1,5 +1,6 @@
 import sys
 import os
+import time
 
 import h5py
 import numpy as np
@@ -38,7 +39,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Set up overdensity grid properties
     ovden_cdim = np.int32(cell_width / target_grid_width)
     ovden_cell_width = cell_width / ovden_cdim
-    full_grid_ncells = boxsize / ovden_cdim
+    full_grid_ncells = boxsize / ovden_cell_width
     ovden_cell_volume = (ovden_cell_width[0] * ovden_cell_width[1]
                          * ovden_cell_width[2])
 
@@ -101,6 +102,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Loop over cells calculating the overdensity grid
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
+        if rank == 0:
+            print(i, j, k, my_cell, time.time() - start)
+        start = time.time()
         # Set up array to store this cells overdensity grid
         ovden_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
                                          ovden_cdim[1] + 1,
