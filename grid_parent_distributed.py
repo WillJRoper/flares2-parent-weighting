@@ -121,6 +121,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             masses = hdf["/PartType1/Masses"][
                      my_offset:my_offset + my_count] * 10 ** 10
 
+            poss[poss > cell_width] -= boxsize[0]
+
             # Compute overdensity grid ijk references
             ovden_ijk = np.int32(poss / ovden_cell_width)
 
