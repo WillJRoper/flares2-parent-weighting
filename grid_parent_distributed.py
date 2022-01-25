@@ -1,94 +1,213 @@
-import numpy as np
-import h5py
 import sys
-import time
+import os
+
+import h5py
+import numpy as np
+from mpi4py import MPI
 
 
-filepath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/DMO/L3200N5760/snapshots/flamingo_0000/flamingo_0000."
-# filepath = "/Users/willroper/Documents/3D Printing/Python/ani_hydro_1379.hdf5"
+# Initializations and preliminaries
+comm = MPI.COMM_WORLD  # get MPI communicator object
+size = comm.size  # total number of processes
+rank = comm.rank  # rank of this process
+status = MPI.Status()  # get MPI status object
 
-def get_and_write_ovdengrid(filepath, zoom_ncells, izoom_width, njobs, jobid):
 
-    total_jobs = 1199
-    job_bins = np.linspace(0, total_jobs, njobs, dtype=int)
-    print(str(jobid) + ":", "I have files",
-          job_bins[jobid], "-", job_bins[jobid + 1])
+def get_cellid(cdim, i, j, k):
+    return (k + cdim[2] * (j + cdim[1] * i))
 
-    for ifile in range(job_bins[jobid], job_bins[jobid + 1]):
 
-        # Open HDF5 file
-        hdf = h5py.File(filepath + str(ifile) + ".hdf5", "r")
+def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
-        # Get metadata
-        boxsize = hdf["Header"].attrs["BoxSize"]
-        z = hdf["Header"].attrs["Redshift"]
-        nparts = hdf["Header"].attrs["NumPart_Total"]
-        nparts_this_file = hdf["Header"].attrs["NumPart_ThisFile"][1]
+    # Open HDF5 file
+    hdf = h5py.File(filepath, "r")
 
-        # Set up overdensity grid array
-        zoom_width = np.array([izoom_width, izoom_width, izoom_width])
-        cell_width = zoom_width / zoom_ncells
-        ncells = np.int32(boxsize / cell_width)
+    # Get metadata
+    boxsize = hdf["Header"].attrs["BoxSize"]
+    z = hdf["Header"].attrs["Redshift"]
+    nparts = hdf["Header"].attrs["NumPart_Total"][1]
+    pmass = hdf["/PartType1/Masses"][0] * 10 ** 10
+    cdim = hdf["Cells/Meta-data"].attrs["dimension"]
+    ncells = hdf["/Cells/Meta-data"].attrs["nr_cells"]
+    cell_width = hdf["Cells/Meta-data"].attrs["size"]
 
-        bins = np.linspace(0, nparts_this_file, 20, dtype=int)
-        print("N_part:", nparts)
-        print("NpartThisFile:", nparts_this_file)
+    # Calculate the mean density
+    tot_mass = np.sum(pmass)
+    mean_density = tot_mass / (boxsize[0] * boxsize[1] * boxsize[2])
+
+    # Set up overdensity grid properties
+    ovden_cdim = np.int32(cell_width / target_grid_width)
+    ovden_cell_width = cell_width / ovden_cdim
+    full_grid_ncells = boxsize / ovden_cdim
+    ovden_cell_volume = (ovden_cell_width[0] * ovden_cell_width[1]
+                         * ovden_cell_width[2])
+
+    # Print some fun stuff
+    if rank == 0:
         print("Boxsize:", boxsize)
         print("Redshift:", z)
-        print("Grid Cell Width:", cell_width)
-        print("Grid NCells:", ncells)
+        print("Npart:", nparts)
+        print("Number of cells:", ncells)
+        print("Cell width:", cell_width)
+        print("N_part:", nparts)
+        print("Sim Cell Width:", cell_width)
+        print("Grid Cell Width:", ovden_cell_width)
+        print("Sim NCells:", ncells)
+        print("Grid NCells:", full_grid_ncells)
 
-        grid_poss = np.zeros((nparts_this_file, 3), dtype=int)
+    # Get the list of simulation cell indices and the associated ijk references
+    all_cells = []
+    i_s = []
+    j_s = []
+    k_s = []
+    for i in range(cdim[0]):
+        for j in range(cdim[1]):
+            for k in range(cdim[2]):
+                cell = (k + cdim[2] * (j + cdim[1] * i))
+                all_cells.append(cell)
+                i_s.append(i)
+                j_s.append(j)
+                k_s.append(k)
 
-        # Get the densities of the particles in this cell
-        poss = hdf["/PartType1/Coordinates"][:, :]
+    # Find the cells and simulation ijk grid references
+    # that this rank has to work on
+    rank_cells = np.linspace(0, len(all_cells), size + 1, dtype=int)
+    my_cells = all_cells[rank_cells[rank]: rank_cells[rank + 1]]
+    my_i_s = i_s[rank_cells[rank]: rank_cells[rank + 1]]
+    my_j_s = j_s[rank_cells[rank]: rank_cells[rank + 1]]
+    my_k_s = k_s[rank_cells[rank]: rank_cells[rank + 1]]
 
-        i = np.int32(poss[:, 0] / cell_width[0])
-        j = np.int32(poss[:, 1] / cell_width[1])
-        k = np.int32(poss[:, 2] / cell_width[2])
+    print("Rank=", rank, "- My Ncells=", len(my_cells))
 
-        grid_poss[:, 0] = i
-        grid_poss[:, 1] = j
-        grid_poss[:, 2] = k
+    # Open HDF5 file
+    if outpath[-1] != "_":
+        outpath += "_"
+    hdf_out = h5py.File(outpath, "w")
 
-        hdf.close()
+    # Store some metadata about the parent box
+    parent = hdf_out.create_group("Parent")
+    parent.attrs["Boxsize"] = boxsize
+    parent.attrs["Redshift"] = z
+    parent.attrs["Npart"] = nparts
+    parent.attrs["Ncells"] = cdim
+    parent.attrs["Cell_Width"] = cell_width
 
-        try:
-            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + "_"
-                                 + str(ifile) + ".hdf5",
-                            "r+")
-        except OSError as e:
-            print(e)
-            grid_hdf = h5py.File("data/parent_ovden_grid_" + str(jobid) + "_"
-                                 + str(ifile) + ".hdf5",
-                            "w")
-        try:
-            zoom_grp = grid_hdf.create_group(str(zoom_width) + "_"
-                                             + str(zoom_ncells))
-        except OSError as e:
-            print(e)
-            del grid_hdf[str(zoom_width) + "_" + str(zoom_ncells)]
-            zoom_grp = grid_hdf.create_group(str(zoom_width) + "_"
-                                             + str(zoom_ncells))
-        zoom_grp.create_dataset("grid-pos", data=grid_poss,
-                                compression="gzip")
-        grid_hdf.close()
+    # Store some metadata about the overdensity grid
+    parent = hdf_out.create_group("Delta_grid")
+    parent.attrs["Cell_Width"] = ovden_cell_width
+    parent.attrs["Ncells_Total"] = full_grid_ncells
+    parent.attrs["Ncells_PerSimCell"] = ovden_cdim
 
-tot_start = time.time()
-njobs = int(sys.argv[2])
-jobid = int(sys.argv[1])
+    # Loop over cells calculating the overdensity grid
+    for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
-zoom_width = 25
-for zoom_ncells in [16, 32, 64, 128, 256]:
-    start = time.time()
-    print("================== zoom width, zoom_ncells =",
-          zoom_width, zoom_ncells, "==================")
-    get_and_write_ovdengrid(filepath, zoom_ncells, zoom_width, njobs, jobid)
-    print("Iteration took:", time.time() - start)
+        # Set up array to store this cells overdensity grid
+        ovden_grid_this_cell = np.zeros(ovden_cdim)
 
-print("Total:", time.time() - tot_start)
+        # Retrieve the offset and counts for this cell
+        my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
+        my_count = hdf["/Cells/Counts/PartType1"][my_cell]
+
+        # Define the edges of this cell
+        my_edges = np.array([i * cell_width[0],
+                             j * cell_width[1],
+                             k * cell_width[2]])
+
+        if my_count > 0:
+            poss = hdf["/PartType1/Coordinates"][
+                   my_offset:my_offset + my_count, :] - my_edges
+            masses = hdf["/PartType1/Masses"][
+                     my_offset:my_offset + my_count] * 10 ** 10
+
+            # Compute overdensity grid ijk references
+            ovden_ijk = np.int32(poss / ovden_cell_width)
+
+            # Store the mass in each grid cell
+            ovden_grid_this_cell[ovden_ijk] += masses
+
+            # Convert the mass entries to overdensities
+            # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
+            ovden_grid_this_cell /= ovden_cell_volume  # to density
+            ovden_grid_this_cell -= mean_density  # relative to mean density
+            ovden_grid_this_cell /= mean_density  # normlised by mean density
+
+        # Create a group for this cell
+        this_cell = hdf_out.create_group(str(i) + "_" + str(j) + "_" + str(k))
+        this_cell.attrs["Sim_Cell_Index"] = my_cell
+        this_cell.create_dataset("grid", data=ovden_grid_this_cell,
+                                 shape=ovden_grid_this_cell.shape,
+                                 dtype=ovden_grid_this_cell.dtype,
+                                 compression="lzf")
+
+    hdf_out.close()
+    hdf.close()
 
 
+def create_meta_file(metapath, ini_rankpath, size):
 
+    # Write the metadata from rank 0 file to meta file
+    rank0path = ini_rankpath + "_rank%s.hdf5" % "0".zfill(4)  # get rank 0 file
+    hdf_rank0 = h5py.File(rank0path, "r")  # open rank 0 file
+    hdf_meta = h5py.File(metapath, "w")  # create meta file
+    for root_key in ["Parent", "Delta_grid"]:  # loop over root groups
+        grp = hdf_meta.create_group(root_key)
+        for key in hdf_rank0[root_key].attrs.keys():
+            grp.attrs[key] = hdf_rank0[root_key].attrs[key]  # write attrs
+
+    hdf_rank0.close()
+
+    # Loop over rank files creating external links
+    for other_rank in range(size):
+
+        # Get the path to this rank
+        rankpath = ini_rankpath + "_rank%s.hdf5" % str(other_rank).zfill(4)
+
+        # Open rankfile
+        hdf_rank = h5py.File(rankpath, "r")
+
+        # Loop over groups creating external links
+        for key in hdf_rank.keys():
+            hdf_meta[key] = h5py.ExternalLink(rankpath, key)
+
+        hdf_rank.close()
+
+    hdf_meta.close()
+
+
+if __name__ == "__main__":
+
+    # Get the commandline argument for which snapshot
+    num = int(sys.argv[1])
+
+    # Extract the snapshot string
+    snaps = [str(i).zfill(4) for i in range(0, 19)]
+    snap = snaps[num]
+
+    # Define input path
+    inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/L2800N5040/" \
+           "HYDRO_FIDUCIAL/snapshots/flamingo_" + snap \
+           + "/flamingo_" + snap + ".hdf5"
+
+    # Define out file name
+    outfile = "overdensity_L2800N5040_HYDRO_" \
+              "snap%s_rank%s.hdf5" % (snap, str(rank).zfill(4))
+    metafile = "overdensity_L2800N5040_HYDRO_snap%s.hdf5" % snap
+    outfile_without_rank = "overdensity_L2800N5040_HYDRO_snap%s_" % snap
+
+    # Define output paths
+    ini_outpath = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+                  "overdensity_gridding/L2800N5040/HYDRO/snap_" + snap
+    if not os.path.isdir(ini_outpath):
+        os.mkdir(ini_outpath)
+    outpath = ini_outpath + "/" + outfile  # Combine file and path
+    ini_rankpath = ini_outpath + "/" + outfile_without_rank  # rankless string
+    metapath = ini_outpath + "/" + metafile
+
+    # Get the overdensity grid for this rank
+    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+
+    # Create the meta file now we have each individual rank file
+    if rank == 0:
+        create_meta_file(metapath, ini_rankpath, size)
 
 
