@@ -141,6 +141,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         # Create a group for this cell
         this_cell = hdf_out.create_group(str(i) + "_" + str(j) + "_" + str(k))
         this_cell.attrs["Sim_Cell_Index"] = my_cell
+        this_cell.attrs["Sim_Cell_Edges"] = my_edges
         this_cell.create_dataset("grid", data=ovden_grid_this_cell,
                                  shape=ovden_grid_this_cell.shape,
                                  dtype=ovden_grid_this_cell.dtype,
