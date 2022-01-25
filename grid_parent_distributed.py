@@ -103,6 +103,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
         # Set up array to store this cells overdensity grid
         ovden_grid_this_cell = np.zeros(ovden_cdim)
+        print(ovden_grid_this_cell)
 
         # Retrieve the offset and counts for this cell
         my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
@@ -123,7 +124,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             ovden_ijk = np.int32(poss / ovden_cell_width)
 
             # Store the mass in each grid cell
-            ovden_grid_this_cell[ovden_ijk] += masses
+            ovden_grid_this_cell[ovden_ijk[:, 0],
+                                 ovden_ijk[:, 1],
+                                 ovden_ijk[:, 2]] += masses
 
             # Convert the mass entries to overdensities
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
@@ -202,7 +205,7 @@ if __name__ == "__main__":
     # Define output paths
     out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
                   "overdensity_gridding/L2800N5040/HYDRO/snap_" + snap
-    if not os.path.isdir(out_dir):
+    if not os.path.isdir(out_dir) and rank == 0:
         os.mkdir(out_dir)
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
