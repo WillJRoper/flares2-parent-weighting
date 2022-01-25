@@ -80,8 +80,6 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     print("Rank=", rank, "- My Ncells=", len(my_cells))
 
     # Open HDF5 file
-    if outpath[-1] != "_":
-        outpath += "_"
     hdf_out = h5py.File(outpath, "w")
 
     # Store some metadata about the parent box
@@ -215,8 +213,8 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Create the meta file now we have each individual rank file
     if rank == 0:
