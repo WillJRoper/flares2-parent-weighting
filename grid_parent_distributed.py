@@ -105,7 +105,6 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         ovden_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
                                          ovden_cdim[1] + 1,
                                          ovden_cdim[2] + 1))
-        print(ovden_grid_this_cell.shape)
 
         # Retrieve the offset and counts for this cell
         my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
@@ -127,7 +126,10 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
             print(ovden_ijk[:, 0].min(), ovden_ijk[:, 0].max(),
                   ovden_ijk[:, 1].min(), ovden_ijk[:, 1].max(),
-                  ovden_ijk[:, 2].min(), ovden_ijk[:, 2].max())
+                  ovden_ijk[:, 2].min(), ovden_ijk[:, 2].max(),
+                  poss[:, 0].min(), poss[:, 0].max(),
+                  poss[:, 1].min(), poss[:, 1].max(),
+                  poss[:, 2].min(), poss[:, 2].max(), my_edges)
 
             # Store the mass in each grid cell
             ovden_grid_this_cell[ovden_ijk[:, 0],
