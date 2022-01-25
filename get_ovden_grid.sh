@@ -1,10 +1,11 @@
 #!/bin/bash -l
 #SBATCH --ntasks 128
 #SBATCH -N 1
-#SBATCH -J Grid-WITH-PERMISSION
-#SBATCH -o logs/standard_output_file.%J.out
-#SBATCH -e logs/standard_error_file.%J.err
-#SBATCH -p cosma8
+#SBATCH --array=1-480%40
+#SBATCH -J FLARES2-OVDEN-GRID-L2800N5040
+#SBATCH -o logs/L2800N5040.%J.out
+#SBATCH -e logs/L2800N5040.%J.err
+#SBATCH -p cosma8-shm
 #SBATCH -A dp004
 #SBATCH --exclusive
 #SBATCH -t 3:00:00
@@ -19,8 +20,9 @@ cd /cosma/home/dp004/dc-rope1/FLARES/FLARES-2-codes/flares2-parent-weighting
 
 source activate flares-env
 
-# Run the program 200 times (on 128 cores).
-mpirun -np 128 /cosma/home/dp004/dc-rope1/parallel_tasks/build/parallel_tasks 0 200 "python ./grid_parent_distributed.py %d 200"
+i=$(($SLURM_ARRAY_TASK_ID - 1))
+
+mpirun -np 128 python grid_parent_distributed.py $i
 
 source deactivate
 
