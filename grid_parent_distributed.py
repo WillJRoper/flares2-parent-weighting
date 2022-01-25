@@ -173,6 +173,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
         rankfile = (outfile_without_rank
                     + "rank%s.hdf5" % str(other_rank).zfill(4))
 
+        print("Linking", rankfile)
+
         # Open rankfile
         hdf_rank = h5py.File(rankfile, "r")
 
