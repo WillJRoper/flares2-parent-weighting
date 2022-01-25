@@ -166,6 +166,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     hdf_rank0.close()
 
+    cdim = hdf_meta["Parent"].attrs["Ncells"]
+
     # Loop over rank files creating external links
     for other_rank in range(size):
 
@@ -180,7 +182,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
         # Loop over groups creating external links with relative path
         for key in hdf_rank.keys():
-            hdf_meta[key] = h5py.ExternalLink(rankfile, key)
+            i, j, k = key.split("_")
+            cid = get_cellid(cdim, int(i), int(j) , int(k))
+            hdf_meta[cid] = h5py.ExternalLink(rankfile, key)
 
         hdf_rank.close()
 
