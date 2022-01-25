@@ -153,6 +153,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     # Change to the data directory to ensure relative paths work
     os.chdir(rankfile_dir)
+    print(os.getcwd())
 
     # Write the metadata from rank 0 file to meta file
     rank0file = (outfile_without_rank
