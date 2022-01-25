@@ -103,7 +103,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
         # Set up array to store this cells overdensity grid
         ovden_grid_this_cell = np.zeros(ovden_cdim)
-        print(ovden_grid_this_cell)
+        print(ovden_grid_this_cell.shape)
 
         # Retrieve the offset and counts for this cell
         my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
