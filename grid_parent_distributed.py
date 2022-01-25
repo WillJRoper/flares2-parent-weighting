@@ -182,6 +182,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
         # Loop over groups creating external links with relative path
         for key in hdf_rank.keys():
+            if key in ["Parent", "Delta_grid"]:
+                continue
             i, j, k = key.split("_")
             cid = get_cellid(cdim, int(i), int(j) , int(k))
             hdf_meta[str(cid)] = h5py.ExternalLink(rankfile, key)
