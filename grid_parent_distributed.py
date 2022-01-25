@@ -184,9 +184,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
         # Loop over groups creating external links with relative path
         for key in hdf_rank["Cells"].keys():
-            i, j, k = key.split("_")
-            cid = get_cellid(cdim, int(i), int(j) , int(k))
-            hdf_meta[str(cid)] = h5py.ExternalLink(rankfile, "/Cells/" + key)
+            hdf_meta[key] = h5py.ExternalLink(rankfile, "/Cells/" + key)
 
         hdf_rank.close()
 
@@ -221,8 +219,8 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Create the meta file now we have each individual rank file
     if rank == 0:
