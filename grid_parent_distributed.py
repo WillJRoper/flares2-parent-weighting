@@ -153,7 +153,6 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     # Change to the data directory to ensure relative paths work
     os.chdir(rankfile_dir)
-    print(os.getcwd())
 
     # Write the metadata from rank 0 file to meta file
     rank0file = (outfile_without_rank
@@ -175,7 +174,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
                     + "rank%s.hdf5" % str(other_rank).zfill(4))
 
         # Open rankfile
-        hdf_rank = h5py.File(rankpath, "r")
+        hdf_rank = h5py.File(rankfile, "r")
 
         # Loop over groups creating external links with relative path
         for key in hdf_rank.keys():
