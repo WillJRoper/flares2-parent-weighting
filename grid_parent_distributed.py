@@ -100,6 +100,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     parent.attrs["Ncells_PerSimCell"] = ovden_cdim
 
     # Loop over cells calculating the overdensity grid
+    start = time.time()
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
         if rank == 0:
