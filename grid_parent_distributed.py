@@ -141,6 +141,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
             ovden_grid_this_cell = (mass_grid_this_cell / ovden_cell_volume) / mean_density
 
+        else:
+            ovden_grid_this_cell = mass_grid_this_cell
+
         # Create a group for this cell
         this_cell = cells_grp.create_group(str(i) + "_" + str(j)
                                            + "_" + str(k))
