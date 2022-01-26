@@ -134,13 +134,16 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             ovden_ijk = np.int32(poss / ovden_cell_width)
 
             # Store the mass in each grid cell
-            mass_grid_this_cell[ovden_ijk[:, 0],
-                                 ovden_ijk[:, 1],
-                                 ovden_ijk[:, 2]] += masses
+            for ii, jj, kk, m in zip(ovden_ijk[:, 0], ovden_ijk[:, 1],
+                                  ovden_ijk[:, 2], masses):
+                mass_grid_this_cell[ii, jj, kk] += m
 
             # Convert the mass entries to overdensities
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
             ovden_grid_this_cell = ((mass_grid_this_cell / ovden_cell_volume) - mean_density) / mean_density  # to density
+
+            print(i, j, k, np.min(ovden_grid_this_cell), 
+                  np.max(ovden_grid_this_cell))
 
         # Create a group for this cell
         this_cell = cells_grp.create_group(str(i) + "_" + str(j)

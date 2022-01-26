@@ -23,6 +23,8 @@ path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
 # Open file
 hdf = h5py.File(path, "r")
 
+mean_density = hdf["Parent"].attrs["Mean_Density"]
+
 # Set up array to store counts
 H_tot = np.zeros_like(bin_cents)
 
@@ -33,7 +35,8 @@ for key in hdf.keys():
     if key in ["Parent", "Delta_grid"]:
         continue
 
-    print(key, np.min(hdf[key]["grid"][...]), np.max(hdf[key]["grid"][...]))
+    print(key, np.min(hdf[key]["grid"][...]) * mean_density + mean_density,
+          np.max(hdf[key]["grid"][...]) * mean_density + mean_density)
 
     # Get counts for this cell
     H, _ = np.histogram(hdf[key]["grid"][...], bins=bin_edges)
