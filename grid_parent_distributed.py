@@ -48,7 +48,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         print("Redshift:", z)
         print("Npart:", nparts)
         print("Number of cells:", ncells)
-        print("Cell width:", mean_density)
+        print("Mean Density:", mean_density)
         print("N_part:", nparts)
         print("Sim Cell Width:", cell_width)
         print("Grid Cell Width:", ovden_cell_width)

@@ -12,7 +12,7 @@ snaps = [str(i).zfill(4) for i in range(0, 19)]
 snap = snaps[num]
 
 # Set up bins
-bin_edges = np.linspace(-1, 1, 100)
+bin_edges = np.linspace(-3, 3, 150)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
 
 # Define path to file
