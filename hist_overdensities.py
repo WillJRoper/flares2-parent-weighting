@@ -1,8 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 import h5py
 import sys
 
+
+sns.set_context("paper")
+sns.set_style('whitegrid')
 
 # Get the commandline argument for which snapshot
 num = int(sys.argv[1])
@@ -15,8 +19,8 @@ snap = snaps[num]
 step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.01
-log_bin_edges = np.arange(-0.5, 0.5 + step, step)
+step = 0.05
+log_bin_edges = np.arange(-1.0, 1.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Define path to file
