@@ -23,7 +23,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Get metadata
     boxsize = hdf["Header"].attrs["BoxSize"]
     z = hdf["Header"].attrs["Redshift"]
-    nparts = hdf["Header"].attrs["NumPart_Total"][1]
+    nparts = hdf["/PartType1/Masses"].size
     pmass = hdf["/PartType1/Masses"][0]
     cdim = hdf["Cells/Meta-data"].attrs["dimension"]
     ncells = hdf["/Cells/Meta-data"].attrs["nr_cells"]
@@ -33,14 +33,15 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     tot_mass = 0
     if rank == 0:
         i = 0
-        while i < hdf["/PartType1/Masses"].size - 10000:
+        step = 100000
+        while i < hdf["/PartType1/Masses"].size - step:
             print(i, nparts, nparts**(1/3))
-            if i + 10000 > hdf["/PartType1/Masses"].size:
+            if i + step > hdf["/PartType1/Masses"].size:
                 tot_mass += np.sum(
                     hdf["/PartType1/Masses"][i: hdf["/PartType1/Masses"].size])
             else:
-                tot_mass += np.sum(hdf["/PartType1/Masses"][i: i + 10000])
-            i += 10000
+                tot_mass += np.sum(hdf["/PartType1/Masses"][i: i + step])
+            i += step
         print(tot_mass, nparts * pmass, tot_mass * nparts / tot_mass * 100)
     comm.Barrier()
     tot_mass = nparts * pmass
