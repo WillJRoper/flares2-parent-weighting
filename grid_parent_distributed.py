@@ -32,7 +32,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     cell_width = hdf["Cells/Meta-data"].attrs["size"]
 
     # Calculate the mean density
-    tot_mass = np.sum(pmass)
+    tot_mass = pmass * nparts
     mean_density = tot_mass / (boxsize[0] * boxsize[1] * boxsize[2])
 
     # Set up overdensity grid properties
@@ -48,7 +48,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         print("Redshift:", z)
         print("Npart:", nparts)
         print("Number of cells:", ncells)
-        print("Cell width:", cell_width)
+        print("Cell width:", mean_density)
         print("N_part:", nparts)
         print("Sim Cell Width:", cell_width)
         print("Grid Cell Width:", ovden_cell_width)
