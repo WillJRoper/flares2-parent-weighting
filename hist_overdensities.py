@@ -36,7 +36,7 @@ for key in hdf.keys():
     print(key)
 
     # Get counts for this cell
-    H, _ = np.histogram(hdf[key][...], bins=bin_edges)
+    H, _ = np.histogram(hdf[key]["grid"][...], bins=bin_edges)
 
     # Add counts to main array
     H_tot += H
