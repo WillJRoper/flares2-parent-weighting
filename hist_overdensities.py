@@ -31,7 +31,7 @@ mean_density = hdf["Parent"].attrs["Mean_Density"]
 
 # Set up array to store counts
 H_tot = np.zeros_like(bin_cents)
-log_H_tot = np.zeros_like(bin_cents)
+log_H_tot = np.zeros_like(log_bin_cents)
 
 # Loop over cells
 for key in hdf.keys():
