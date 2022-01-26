@@ -27,6 +27,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     kernel_width = cells_per_kernel * grid_cell_width
 
     # Print some nice things
+    print("Boxsize:", boxsize)
+    print("Mean Density:", mean_density)
+    print("Grid Cell Width:", grid_cell_width)
     print("Kernel Width:", kernel_width)
     print("Grid cells in kernel:", cells_per_kernel)
 
