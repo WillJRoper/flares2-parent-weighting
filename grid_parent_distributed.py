@@ -26,13 +26,13 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     boxsize = hdf["Header"].attrs["BoxSize"]
     z = hdf["Header"].attrs["Redshift"]
     nparts = hdf["Header"].attrs["NumPart_Total"][1]
-    pmass = hdf["/PartType1/Masses"][0] * 10 ** 10
+    pmass = hdf["/PartType1/Masses"][0]
     cdim = hdf["Cells/Meta-data"].attrs["dimension"]
     ncells = hdf["/Cells/Meta-data"].attrs["nr_cells"]
     cell_width = hdf["Cells/Meta-data"].attrs["size"]
 
     # Calculate the mean density
-    tot_mass = np.sum(hdf["/PartType1/Masses"][...])
+    tot_mass = nparts * pmass
     mean_density = tot_mass / (boxsize[0] * boxsize[1] * boxsize[2])
 
     # Set up overdensity grid properties
@@ -89,7 +89,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     parent.attrs["Npart"] = nparts
     parent.attrs["Ncells"] = cdim
     parent.attrs["Cell_Width"] = cell_width
-    parent.attrs["DM_Mass"] = pmass / 10 ** 10
+    parent.attrs["DM_Mass"] = pmass
     parent.attrs["Mean_Density"] = mean_density
 
     # Store some metadata about the overdensity grid
@@ -105,7 +105,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
 
         # Set up array to store this cells overdensity grid
-        ovden_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
+        mass_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
                                          ovden_cdim[1] + 1,
                                          ovden_cdim[2] + 1))
 
@@ -122,7 +122,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             poss = hdf["/PartType1/Coordinates"][
                    my_offset:my_offset + my_count, :] - my_edges
             masses = hdf["/PartType1/Masses"][
-                     my_offset:my_offset + my_count] * 10 ** 10
+                     my_offset:my_offset + my_count]
 
             poss[poss > cell_width] -= boxsize[0]
             poss[poss < -cell_width] += boxsize[0]
@@ -131,15 +131,13 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             ovden_ijk = np.int32(poss / ovden_cell_width)
 
             # Store the mass in each grid cell
-            ovden_grid_this_cell[ovden_ijk[:, 0],
+            mass_grid_this_cell[ovden_ijk[:, 0],
                                  ovden_ijk[:, 1],
                                  ovden_ijk[:, 2]] += masses
 
             # Convert the mass entries to overdensities
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
-            ovden_grid_this_cell /= ovden_cell_volume  # to density
-            ovden_grid_this_cell -= mean_density  # relative to mean density
-            ovden_grid_this_cell /= mean_density  # normlised by mean density
+            ovden_grid_this_cell = ((mass_grid_this_cell / ovden_cell_volume) - mean_density) / mean_density  # to density
 
         # Create a group for this cell
         this_cell = cells_grp.create_group(str(i) + "_" + str(j)
