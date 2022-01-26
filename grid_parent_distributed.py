@@ -34,6 +34,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     if rank == 0:
         i = 0
         while i < hdf["/PartType1/Masses"].size - 10000:
+            print(i, nparts, nparts**(1/3))
             if i + 10000 > hdf["/PartType1/Masses"].size:
                 tot_mass += np.sum(
                     hdf["/PartType1/Masses"][i: hdf["/PartType1/Masses"].size])
