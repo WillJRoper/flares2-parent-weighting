@@ -24,7 +24,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     boxsize = hdf["Header"].attrs["BoxSize"]
     z = hdf["Header"].attrs["Redshift"]
     nparts = hdf["/PartType1/Masses"].size
-    pmass = hdf["/PartType1/Masses"][0]
+    pmass = hdf["Header"].attrs["InitialMassTable"][1]
+    if rank == 0:
+        print(pmass, hdf["/PartType1/Masses"][:10])
     cdim = hdf["Cells/Meta-data"].attrs["dimension"]
     ncells = hdf["/Cells/Meta-data"].attrs["nr_cells"]
     cell_width = hdf["Cells/Meta-data"].attrs["size"]
@@ -33,7 +35,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     tot_mass = 0
     if rank == 0:
         i = 0
-        step = 100000000
+        step = 10000000
         while i < hdf["/PartType1/Masses"].size - step:
             print(i, nparts, nparts**(1/3))
             if i + step > hdf["/PartType1/Masses"].size:
