@@ -48,6 +48,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         print("Boxsize:", boxsize)
         print("Redshift:", z)
         print("Npart:", nparts)
+        print("Particle Mass:", pmass)
         print("Number of cells:", ncells)
         print("Mean Density:", mean_density)
         print("N_part:", nparts)
@@ -142,7 +143,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
             ovden_grid_this_cell = ((mass_grid_this_cell / ovden_cell_volume) - mean_density) / mean_density  # to density
 
-            print(i, j, k, np.min(ovden_grid_this_cell), 
+            print(i, j, k, np.min(ovden_grid_this_cell[ovden_grid_this_cell != -1.0]),
                   np.max(ovden_grid_this_cell))
 
         # Create a group for this cell
