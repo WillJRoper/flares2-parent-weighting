@@ -13,8 +13,11 @@ snap = snaps[num]
 
 # Set up bins
 step = 0.1
-bin_edges = np.arange(-15, 15 + step, step)
+bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
+step = 0.01
+log_bin_edges = np.arange(-0.5, 0.5 + step, step)
+log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Define path to file
 metafile = "overdensity_L2800N5040_HYDRO_snap%s.hdf5" % snap
@@ -28,6 +31,7 @@ mean_density = hdf["Parent"].attrs["Mean_Density"]
 
 # Set up array to store counts
 H_tot = np.zeros_like(bin_cents)
+log_H_tot = np.zeros_like(bin_cents)
 
 # Loop over cells
 for key in hdf.keys():
@@ -45,15 +49,34 @@ for key in hdf.keys():
     # Add counts to main array
     H_tot += H
 
+    # Get counts for this cell
+    H, _ = np.histogram(np.log10(hdf[key]["grid"][...]), bins=log_bin_edges)
+
+    # Add counts to main array
+    log_H_tot += H
+
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.semilogy()
 
 ax.plot(bin_cents, H_tot, label="L2800N5040_HYDRO_2Mpc")
 
-ax.set_xlabel("$\delta$")
+ax.set_xlabel("$1 + \delta$")
 ax.set_ylabel("$N$")
 
 fig.savefig("plots/overdensity_hist_" + snap + ".png", bbox_inches="tight")
+
+plt.close()
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+ax.semilogy()
+
+ax.plot(log_bin_cents, log_H_tot, label="L2800N5040_HYDRO_2Mpc")
+
+ax.set_xlabel("$\log_{10}(1 + \delta)$")
+ax.set_ylabel("$N$")
+
+fig.savefig("plots/log_overdensity_hist_" + snap + ".png", bbox_inches="tight")
 
 plt.close()
