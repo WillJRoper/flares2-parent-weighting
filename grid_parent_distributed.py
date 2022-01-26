@@ -32,7 +32,11 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     cell_width = hdf["Cells/Meta-data"].attrs["size"]
 
     # Calculate the mean density
-    print(np.sum(hdf["/PartType1/Masses"][:1000]), 1000 * pmass)
+    tot_mass = 0
+    if rank == 0:
+        for i in range(hdf["/PartType1/Masses"].size):
+            tot_mass += hdf["/PartType1/Masses"][i]
+        print(tot_mass, nparts * pmass, tot_mass * nparts / tot_mass * 100)
     tot_mass = nparts * pmass
     mean_density = tot_mass / (boxsize[0] * boxsize[1] * boxsize[2])
 
