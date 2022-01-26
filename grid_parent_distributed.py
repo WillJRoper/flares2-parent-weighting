@@ -34,9 +34,16 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Calculate the mean density
     tot_mass = 0
     if rank == 0:
-        for i in range(hdf["/PartType1/Masses"].size):
-            tot_mass += hdf["/PartType1/Masses"][i]
+        i = 0
+        while i < hdf["/PartType1/Masses"].size - 10000:
+            if  i + 10000 > hdf["/PartType1/Masses"].size:
+                tot_mass += hdf["/PartType1/Masses"][i: hdf["/PartType1/Masses"].size]
+            else:
+                tot_mass += hdf["/PartType1/Masses"][
+                            i: i + 10000]
+            i += 10000
         print(tot_mass, nparts * pmass, tot_mass * nparts / tot_mass * 100)
+    comm.Barrier()
     tot_mass = nparts * pmass
     mean_density = tot_mass / (boxsize[0] * boxsize[1] * boxsize[2])
 
@@ -145,7 +152,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
             # Convert the mass entries to overdensities
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
-            ovden_grid_this_cell = ((mass_grid_this_cell / ovden_cell_volume) - mean_density) / mean_density  # to density
+            ovden_grid_this_cell = (mass_grid_this_cell / ovden_cell_volume) / mean_density  # to density
 
             # print(i, j, k, np.min(ovden_grid_this_cell[ovden_grid_this_cell != -1.0]),
             #       np.max(ovden_grid_this_cell))
