@@ -33,7 +33,7 @@ for key in hdf.keys():
     if key in ["Parent", "Delta_grid"]:
         continue
 
-    print(key)
+    print(key, np.min(hdf[key]["grid"][...]), np.max(hdf[key]["grid"][...]))
 
     # Get counts for this cell
     H, _ = np.histogram(hdf[key]["grid"][...], bins=bin_edges)
@@ -48,7 +48,7 @@ ax.semilogy()
 ax.plot(bin_cents, H_tot, label="L2800N5040_HYDRO_2Mpc")
 
 ax.set_xlabel("$\delta$")
-ax.set_ylabel("$N")
+ax.set_ylabel("$N$")
 
 fig.savefig("plots/overdensity_hist_" + snap + ".png", bbox_inches="tight")
 
