@@ -220,6 +220,9 @@ if __name__ == "__main__":
     # Get the overdensity grid for this rank
     get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
+    # Ensure all files are finished writing
+    comm.Barrier()
+
     # Create the meta file now we have each individual rank file
     if rank == 0:
         create_meta_file(metafile, out_dir, outfile_without_rank, size)
