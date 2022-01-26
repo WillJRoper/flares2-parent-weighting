@@ -89,6 +89,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     parent.attrs["Npart"] = nparts
     parent.attrs["Ncells"] = cdim
     parent.attrs["Cell_Width"] = cell_width
+    parent.attrs["DM_Mass"] = pmass / 10 ** 10
+    parent.attrs["Mean_Density"] = mean_density
 
     # Store some metadata about the overdensity grid
     parent = hdf_out.create_group("Delta_grid")
