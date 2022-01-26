@@ -95,7 +95,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                                                   low_k: low_k
                                                          + cells_per_kernel])
                 # Store ijks and edges
-                edges[(ind, :)] = np.array([low_i * grid_cell_width,
+                edges[ind, :] = np.array([low_i * grid_cell_width,
                                             low_j * grid_cell_width,
                                             low_k * grid_cell_width])
 
