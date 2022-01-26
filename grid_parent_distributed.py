@@ -1,10 +1,9 @@
-import sys
 import os
+import sys
 
 import h5py
 import numpy as np
 from mpi4py import MPI
-
 
 # Initializations and preliminaries
 comm = MPI.COMM_WORLD  # get MPI communicator object
@@ -18,7 +17,6 @@ def get_cellid(cdim, i, j, k):
 
 
 def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
-
     # Open HDF5 file
     hdf = h5py.File(filepath, "r")
 
@@ -36,11 +34,11 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     if rank == 0:
         i = 0
         while i < hdf["/PartType1/Masses"].size - 10000:
-            if  i + 10000 > hdf["/PartType1/Masses"].size:
-                tot_mass += hdf["/PartType1/Masses"][i: hdf["/PartType1/Masses"].size]
+            if i + 10000 > hdf["/PartType1/Masses"].size:
+                tot_mass += np.sum(
+                    hdf["/PartType1/Masses"][i: hdf["/PartType1/Masses"].size])
             else:
-                tot_mass += hdf["/PartType1/Masses"][
-                            i: i + 10000]
+                tot_mass += np.sum(hdf["/PartType1/Masses"][i: i + 10000])
             i += 10000
         print(tot_mass, nparts * pmass, tot_mass * nparts / tot_mass * 100)
     comm.Barrier()
@@ -121,8 +119,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
         # Set up array to store this cells overdensity grid
         mass_grid_this_cell = np.zeros((ovden_cdim[0] + 1,
-                                         ovden_cdim[1] + 1,
-                                         ovden_cdim[2] + 1))
+                                        ovden_cdim[1] + 1,
+                                        ovden_cdim[2] + 1))
 
         # Retrieve the offset and counts for this cell
         my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
@@ -147,12 +145,13 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
             # Store the mass in each grid cell
             for ii, jj, kk, m in zip(ovden_ijk[:, 0], ovden_ijk[:, 1],
-                                  ovden_ijk[:, 2], masses):
+                                     ovden_ijk[:, 2], masses):
                 mass_grid_this_cell[ii, jj, kk] += m
 
             # Convert the mass entries to overdensities
             # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
-            ovden_grid_this_cell = (mass_grid_this_cell / ovden_cell_volume) / mean_density  # to density
+            ovden_grid_this_cell = (
+                                               mass_grid_this_cell / ovden_cell_volume) / mean_density  # to density
 
             # print(i, j, k, np.min(ovden_grid_this_cell[ovden_grid_this_cell != -1.0]),
             #       np.max(ovden_grid_this_cell))
@@ -172,7 +171,6 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
 
 def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
-
     # Change to the data directory to ensure relative paths work
     os.chdir(rankfile_dir)
 
@@ -218,8 +216,8 @@ if __name__ == "__main__":
 
     # Define input path
     inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/L2800N5040/" \
-           "HYDRO_FIDUCIAL/snapshots/flamingo_" + snap \
-           + "/flamingo_" + snap + ".hdf5"
+             "HYDRO_FIDUCIAL/snapshots/flamingo_" + snap \
+             + "/flamingo_" + snap + ".hdf5"
 
     # Define out file name
     outfile = "overdensity_L2800N5040_HYDRO_" \
@@ -229,7 +227,7 @@ if __name__ == "__main__":
 
     # Define output paths
     out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
-                  "overdensity_gridding/L2800N5040/HYDRO/snap_" + snap
+              "overdensity_gridding/L2800N5040/HYDRO/snap_" + snap
     if not os.path.isdir(out_dir) and rank == 0:
         os.mkdir(out_dir)
     outpath = out_dir + "/" + outfile  # Combine file and path
@@ -244,5 +242,3 @@ if __name__ == "__main__":
     # Create the meta file now we have each individual rank file
     if rank == 0:
         create_meta_file(metafile, out_dir, outfile_without_rank, size)
-
-
