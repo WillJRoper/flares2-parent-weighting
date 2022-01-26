@@ -44,9 +44,6 @@ for key in hdf.keys():
     if key in ["Parent", "Delta_grid"]:
         continue
 
-    print(key, np.min(hdf[key]["grid"][...]) * mean_density + mean_density,
-          np.max(hdf[key]["grid"][...]) * mean_density + mean_density)
-
     # Get counts for this cell
     H, _ = np.histogram(hdf[key]["grid"][...], bins=bin_edges)
 

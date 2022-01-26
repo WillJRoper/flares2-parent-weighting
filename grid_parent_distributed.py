@@ -37,7 +37,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Set up overdensity grid properties
     ovden_cdim = np.int32(cell_width / target_grid_width)
     ovden_cell_width = cell_width / ovden_cdim
-    full_grid_ncells = boxsize / ovden_cell_width
+    full_grid_ncells = np.int32(boxsize / ovden_cell_width)
     ovden_cell_volume = (ovden_cell_width[0] * ovden_cell_width[1]
                          * ovden_cell_width[2])
 
