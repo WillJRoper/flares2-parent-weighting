@@ -56,9 +56,12 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
         # Get the overdensity grid and convert to mass
         grid = cell_grp["grid"][...]
 
-        ovden_grid[i: i + grid.shape[0],
-                   j: j + grid.shape[1],
-                   k: k + grid.shape[2]] = grid
+        print(grid.shape, i, j, k,
+              i + grid.shape[0], j + grid.shape[1], k + grid.shape[2])
+
+        ovden_grid[i: i + grid.shape[0] + 1,
+                   j: j + grid.shape[1] + 1,
+                   k: k + grid.shape[2] + 1] = grid
 
     hdf.close()
 
@@ -89,6 +92,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
             low_j += 1
             for k in range(smooth_grid.shape[2]):
                 low_k += 1
+
+                print(i, j, k, low_i, low_j, low_k, ind)
 
                 # Get the mean of these overdensities
                 ovden_kernel = np.mean(ovden_grid[low_i: low_i
