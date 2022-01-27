@@ -47,15 +47,13 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         print("Redshift:", z)
         print("Npart:", nparts)
         print("Particle Mass:", pmass)
-        print("Number of cells:", ncells)
+        print("Number of simulation cells:", ncells)
         print("Mean Density:", mean_density)
-        print("N_part:", nparts)
         print("Sim Cell Width:", cell_width)
         print("Grid Cell Width:", ovden_cell_width)
         print("Grid Cell Volume:", ovden_cell_width[0]
               * ovden_cell_width[1] * ovden_cell_width[2])
-        print("Sim NCells:", ncells)
-        print("Grid NCells:", full_grid_ncells + 2)
+        print("Parent Grid NCells:", full_grid_ncells + 2)
 
     # Get the list of simulation cell indices and the associated ijk references
     all_cells = []
@@ -117,9 +115,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
         my_count = hdf["/Cells/Counts/PartType1"][my_cell]
 
         # Define the edges of this cell with pad region
-        my_edges = np.array([i * cell_width[0] - cell_width[0],
-                             j * cell_width[1] - cell_width[1],
-                             k * cell_width[2] - cell_width[2]])
+        my_edges = np.array([(i * cell_width[0]) - ovden_cell_width[0],
+                             (j * cell_width[1]) - ovden_cell_width[1],
+                             (k * cell_width[2]) - ovden_cell_width[2]])
 
         if my_count > 0:
             poss = hdf["/PartType1/Coordinates"][
