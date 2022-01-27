@@ -221,7 +221,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
         hdf_rank.close()
 
-    hdf_meta.create_dataset("Parent_Grid", data=full_grid, shape=full_grid,
+    hdf_meta.create_dataset("Parent_Grid", data=full_grid, shape=full_grid.shape,
                             dtype=full_grid.dtype, compression="lzf")
 
     hdf_meta.close()
