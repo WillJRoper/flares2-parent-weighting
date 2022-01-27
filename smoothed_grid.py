@@ -84,7 +84,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                                           - grid_cell_width[1],
                                           low_k * grid_cell_width[2]
                                           - grid_cell_width[2]])
-                centres[ind, :] = edges + (kernel_width / 2)
+                centres[ind, :] = edges[ind, :] + (kernel_width / 2)
 
                 # Store smoothed value in both the grid for
                 # visualisation and array
