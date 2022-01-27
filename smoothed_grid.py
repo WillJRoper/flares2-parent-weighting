@@ -35,7 +35,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     print("Grid cells total:", ngrid_cells)
 
     # Get full parent grid
-    # NOTE: this has a 1 cell pad region
+    # NOTE: this has a 1 grid cell pad region
     ovden_grid = hdf["Parent_Grid"][...]
 
     hdf.close()
@@ -44,9 +44,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                             ovden_grid.shape[1] - cells_per_kernel,
                             ovden_grid.shape[2] - cells_per_kernel))
-    smooth_vals = np.zeros(ovden_grid.shape[0] - cells_per_kernel
-                           * ovden_grid.shape[1] - cells_per_kernel
-                           * ovden_grid.shape[2] - cells_per_kernel)
+    smooth_vals = np.zeros((ovden_grid.shape[0] - cells_per_kernel)
+                           * (ovden_grid.shape[1] - cells_per_kernel)
+                           * (ovden_grid.shape[2] - cells_per_kernel))
 
     # Set up array to store centres and edges
     edges = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
