@@ -178,7 +178,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     # Get the full parent overdensity grid dimensions
     # (this has a 1 cell pad region)
-    ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"]
+    ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"] + 2
 
     # Get the grid cell width
     grid_cell_width = hdf_meta["Delta_grid"].attrs["Cell_Width"]
