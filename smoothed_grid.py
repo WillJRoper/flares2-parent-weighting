@@ -59,9 +59,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
         print(grid.shape, i, j, k,
               i + grid.shape[0], j + grid.shape[1], k + grid.shape[2])
 
-        ovden_grid[i: i + grid.shape[0] + 1,
-                   j: j + grid.shape[1] + 1,
-                   k: k + grid.shape[2] + 1] = grid
+        ovden_grid[i: i + grid.shape[0],
+                   j: j + grid.shape[1],
+                   k: k + grid.shape[2]] = grid
 
     hdf.close()
 
