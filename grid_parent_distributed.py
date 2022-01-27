@@ -214,14 +214,13 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
             # Get the overdensity grid and convert to mass
             grid = cell_grp["grid"][...]
 
-            print(grid.shape, i, j, k, i - 1, j - 1, k - 1,
-                  i + grid.shape[0], j + grid.shape[1], k + grid.shape[2])
-
-            full_grid[i: i + grid.shape[0], j: j + grid.shape[1], k: k + grid.shape[2]] = grid
+            full_grid[i: i + grid.shape[0], j: j + grid.shape[1],
+            k: k + grid.shape[2]] = grid
 
         hdf_rank.close()
 
-    hdf_meta.create_dataset("Parent_Grid", data=full_grid, shape=full_grid.shape,
+    hdf_meta.create_dataset("Parent_Grid", data=full_grid,
+                            shape=full_grid.shape,
                             dtype=full_grid.dtype, compression="lzf")
 
     hdf_meta.close()
@@ -255,8 +254,8 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # # Get the overdensity grid for this rank
-    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    # Get the overdensity grid for this rank
+    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Ensure all files are finished writing
     comm.Barrier()
