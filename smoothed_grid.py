@@ -32,40 +32,13 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     print("Grid Cell Width:", grid_cell_width)
     print("Kernel Width:", kernel_width)
     print("Grid cells in kernel:", cells_per_kernel)
+    print("Grid cells total:", ngrid_cells)
 
-    # Set up mass grid
-    ovden_grid = np.zeros((int(ngrid_cells[0]), int(ngrid_cells[1]),
-                          int(ngrid_cells[2])))
-
-    # Loop over simulation cells to build single grid
-    for key in hdf.keys():
-
-        # Skip meta data
-        if key in ["Parent", "Delta_grid"]:
-            continue
-
-        # Get this cells hdf5 group and edges
-        cell_grp = hdf[key]
-        edges = cell_grp.attrs["Sim_Cell_Edges"]
-
-        # Get the ijk grid coordinates associated to this cell
-        i = int(edges[0] / grid_cell_width[0])
-        j = int(edges[1] / grid_cell_width[1])
-        k = int(edges[2] / grid_cell_width[2])
-
-        # Get the overdensity grid and convert to mass
-        grid = cell_grp["grid"][...]
-
-        print(grid.shape, i, j, k,
-              i + grid.shape[0], j + grid.shape[1], k + grid.shape[2])
-
-        ovden_grid[i: i + grid.shape[0],
-                   j: j + grid.shape[1],
-                   k: k + grid.shape[2]] = grid
+    # Get full parent grid
+    # NOTE: this has a 1 cell pad region
+    ovden_grid = hdf["Parent_Grid"][...]
 
     hdf.close()
-
-    print("Created Grid")
 
     # Set up grid for the smoothed
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
@@ -75,9 +48,11 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                            * ovden_grid.shape[1] - cells_per_kernel
                            * ovden_grid.shape[2] - cells_per_kernel)
 
-    # Set up array to store ijks and edges
+    # Set up array to store centres and edges
     edges = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
                       * ovden_grid.shape[2], 3))
+    centres = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
+                        * ovden_grid.shape[2], 3))
 
     # Initialise pointers to edges of kernel in overdensity grid
     low_i = -1
@@ -102,10 +77,14 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                                                          + cells_per_kernel,
                                                   low_k: low_k
                                                          + cells_per_kernel])
-                # Store ijks and edges
-                edges[ind, :] = np.array([low_i * grid_cell_width,
-                                            low_j * grid_cell_width,
-                                            low_k * grid_cell_width])
+                # Store ijks and edges (subtracting a cell for the pad region)
+                edges[ind, :] = np.array([low_i * grid_cell_width[0]
+                                          - grid_cell_width[0],
+                                          low_j * grid_cell_width[1]
+                                          - grid_cell_width[1],
+                                          low_k * grid_cell_width[2]
+                                          - grid_cell_width[2]])
+                centres[ind, :] = edges + (kernel_width / 2)
 
                 # Store smoothed value in both the grid for
                 # visualisation and array
@@ -130,6 +109,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                        compression="lzf")
     hdf.create_dataset("Smoothed_Region_Edges", data=edges,
                        shape=edges.shape, dtype=edges.dtype,
+                       compression="lzf")
+    hdf.create_dataset("Smoothed_Region_Centres", data=centres,
+                       shape=centres.shape, dtype=centres.dtype,
                        compression="lzf")
     hdf.close()
 
