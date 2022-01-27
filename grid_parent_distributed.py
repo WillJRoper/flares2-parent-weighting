@@ -185,6 +185,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     # Set up full grid array
     full_grid = np.zeros((ngrid_cells[0], ngrid_cells[1], ngrid_cells[2]))
+    print(full_grid.shape)
 
     # Loop over rank files creating external links
     for other_rank in range(size):
