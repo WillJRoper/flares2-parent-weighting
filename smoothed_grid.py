@@ -50,8 +50,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
 
         # Get the ijk grid coordinates associated to this cell
         i = int(edges[0] / grid_cell_width[0])
-        j = int(edges[0] / grid_cell_width[0])
-        k = int(edges[0] / grid_cell_width[0])
+        j = int(edges[1] / grid_cell_width[1])
+        k = int(edges[2] / grid_cell_width[2])
 
         # Get the overdensity grid and convert to mass
         grid = cell_grp["grid"][...]
