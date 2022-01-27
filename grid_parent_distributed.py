@@ -202,7 +202,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
             hdf_meta[key] = h5py.ExternalLink(rankfile, "/Cells/" + key)
 
             # Get this cells hdf5 group and edges
-            cell_grp = hdf_rank[key]
+            cell_grp = hdf_rank["Cells"][key]
             edges = cell_grp.attrs["Sim_Cell_Edges"]
 
             # Get the ijk grid coordinates associated to this cell
@@ -254,8 +254,8 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
 
     # Ensure all files are finished writing
     comm.Barrier()
