@@ -2,9 +2,17 @@ import sys
 
 import numpy as np
 import h5py
+from mpi4py import MPI
 
 
-def get_smoothed_grid(snap, ini_kernel_width, outdir):
+# Initializations and preliminaries
+comm = MPI.COMM_WORLD  # get MPI communicator object
+size = comm.size  # total number of processes
+rank = comm.rank  # rank of this process
+status = MPI.Status()  # get MPI status object
+
+
+def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     # Define path to file
     metafile = "overdensity_L2800N5040_HYDRO_snap%s.hdf5" % snap
@@ -27,12 +35,13 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     kernel_width = cells_per_kernel * grid_cell_width
 
     # Print some nice things
-    print("Boxsize:", boxsize)
-    print("Mean Density:", mean_density)
-    print("Grid Cell Width:", grid_cell_width)
-    print("Kernel Width:", kernel_width)
-    print("Grid cells in kernel:", cells_per_kernel)
-    print("Grid cells total:", ngrid_cells)
+    if rank == 0:
+        print("Boxsize:", boxsize)
+        print("Mean Density:", mean_density)
+        print("Grid Cell Width:", grid_cell_width)
+        print("Kernel Width:", kernel_width)
+        print("Grid cells in kernel:", cells_per_kernel)
+        print("Grid cells total:", ngrid_cells)
 
     # Get full parent grid
     # NOTE: this has a 1 grid cell pad region
@@ -54,17 +63,24 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
     centres = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
                         * ovden_grid.shape[2], 3))
 
-    # Initialise pointers to edges of kernel in overdensity grid
+    # Initialise pointer to i edges of kernel in overdensity grid
     low_i = -1
-    low_j = -1
-    low_k = -1
+
+    # Get i coordinates for this rank
+    my_is = np.linspace(0, smooth_grid.shape[0], size + 1)
+    print("Rank: %d has %d cells" % (rank,
+                                     (my_is[rank + 1] - my_is[rank]
+                                      * smooth_grid.shape[1]
+                                      * smooth_grid.shape[2])))
 
     # Loop over the smoothed cells
     ind = 0
-    for i in range(smooth_grid.shape[0]):
+    for i in range(my_is[rank], my_is[rank + 1]):
         low_i += 1
+        low_j = -1  # initialise j edges of kernel in overdensity grid
         for j in range(smooth_grid.shape[1]):
             low_j += 1
+            low_k = -1  # initialise k edges of kernel in overdensity grid
             for k in range(smooth_grid.shape[2]):
                 low_k += 1
 
@@ -77,6 +93,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                                                          + cells_per_kernel,
                                                   low_k: low_k
                                                          + cells_per_kernel])
+
                 # Store ijks and edges (subtracting a cell for the pad region)
                 edges[ind, :] = np.array([low_i * grid_cell_width[0]
                                           - grid_cell_width[0],
@@ -94,9 +111,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                 # Increment index counter
                 ind += 1
 
-    # Set up the outpath
+    # Set up the outpath for each rank file
     outpath = outdir + "smoothed_" + metafile.split(".")[0] \
-              + "_%d.hdf5" % ini_kernel_width
+              + "_kernel%d_rank%d.hdf5" % (ini_kernel_width, rank)
 
     # Write out the results of smoothing
     hdf = h5py.File(outpath, "w")
@@ -115,6 +132,36 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir):
                        compression="lzf")
     hdf.close()
 
+    comm.Barrier()
+
+    if rank == 0:
+
+        # Set up the outpaths
+        outpath = outdir + "smoothed_" + metafile.split(".")[0] \
+                  + "_kernel%d.hdf5" % ini_kernel_width
+        outpath0 = outdir + "smoothed_" + metafile.split(".")[0] \
+                  + "_kernel%d_rank0.hdf5" % ini_kernel_width
+
+        # Open file to combine results
+        hdf = h5py.File(outpath, "w")
+
+        # Open rank 0 file to get metadata
+        hdf_rank0 = h5py.File(outpath0, "r")  # open rank 0 file
+        for key in hdf_rank0.attrs.keys():
+            hdf.attrs[key] = hdf_rank0.attrs[key]  # write attrs
+
+        hdf_rank0.close()
+
+        for other_rank in range(size):
+
+            # Set up the outpath for each rank file
+            rank_outpath = outdir + "smoothed_" + metafile.split(".")[0]\
+                           + "_kernel%d_rank%d.hdf5" % (ini_kernel_width,
+                                                        other_rank)
+
+            hdf_rank0 = h5py.File(outpath, "r")  # open rank 0 file
+
+
 
 if __name__ == "__main__":
 
@@ -131,6 +178,6 @@ if __name__ == "__main__":
 
     # Run smoothing
     ini_kernel_width = 25  # in cMpc
-    get_smoothed_grid(snap, ini_kernel_width, outdir)
+    get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size)
 
 
