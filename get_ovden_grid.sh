@@ -1,6 +1,6 @@
 #!/bin/bash -l
-#SBATCH --ntasks 256
-#SBATCH -N 2
+#SBATCH --ntasks 512
+#SBATCH -N 4
 #SBATCH --array=1-20%1
 #SBATCH -J FLARES2-OVDEN-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040.%J.out
@@ -22,7 +22,7 @@ source activate flares-env
 
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
-mpirun -np 256 python grid_parent_distributed.py $i
+mpirun -np 512 python grid_parent_distributed.py $i
 
 source deactivate
 

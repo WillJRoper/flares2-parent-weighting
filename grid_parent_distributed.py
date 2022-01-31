@@ -16,7 +16,11 @@ def get_cellid(cdim, i, j, k):
     return (k + cdim[2] * (j + cdim[1] * i))
 
 
-def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
+def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0, 
+                  pad_region=2):
+    
+    # Define pad region cell numer (double pad_region)
+    pad_cells = 2 * pad_region
 
     # Open HDF5 file
     hdf = h5py.File(filepath, "r")
@@ -37,7 +41,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     # Set up overdensity grid properties
     ovden_cdim = np.int32(cell_width / target_grid_width)
     ovden_cell_width = cell_width / ovden_cdim
-    full_grid_ncells = np.int32(boxsize / ovden_cell_width)
+    full_grid_ncells = ovden_cdim * cdim
     ovden_cell_volume = (ovden_cell_width[0] * ovden_cell_width[1]
                          * ovden_cell_width[2])
 
@@ -97,6 +101,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     parent.attrs["Cell_Width"] = ovden_cell_width
     parent.attrs["Ncells_Total"] = full_grid_ncells
     parent.attrs["Ncells_PerSimCell"] = ovden_cdim
+    parent.attrs["NPadding_Cells"] = pad_region
 
     # Create cells group
     cells_grp = hdf_out.create_group("Cells")
@@ -106,22 +111,22 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
 
         # Set up array to store this cells overdensity grid
         # with pad region of 1 cell
-        mass_grid_this_cell = np.zeros((ovden_cdim[0] + 2,
-                                        ovden_cdim[1] + 2,
-                                        ovden_cdim[2] + 2))
+        mass_grid_this_cell = np.zeros((ovden_cdim[0] + pad_cells,
+                                        ovden_cdim[1] + pad_cells,
+                                        ovden_cdim[2] + pad_cells))
 
         # Retrieve the offset and counts for this cell
         my_offset = hdf["/Cells/OffsetsInFile/PartType1"][my_cell]
         my_count = hdf["/Cells/Counts/PartType1"][my_cell]
 
         # Define the edges of this cell with pad region
-        my_edges = np.array([(i * cell_width[0]) - ovden_cell_width[0],
-                             (j * cell_width[1]) - ovden_cell_width[1],
-                             (k * cell_width[2]) - ovden_cell_width[2]])
+        my_edges = np.array([(i * cell_width[0]),
+                             (j * cell_width[1]),
+                             (k * cell_width[2])])
 
         if my_count > 0:
             poss = hdf["/PartType1/Coordinates"][
-                   my_offset:my_offset + my_count, :] - my_edges
+                   my_offset:my_offset + my_count, :] - my_edges + (pad_region * ovden_cell_width)
             masses = hdf["/PartType1/Masses"][
                      my_offset:my_offset + my_count]
 
@@ -160,7 +165,12 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0):
     hdf.close()
 
 
-def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
+def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
+                     size, pad_region):
+    
+    # Define padding pixels
+    pad_cells = 2 * pad_region
+    
     # Change to the data directory to ensure relative paths work
     os.chdir(rankfile_dir)
 
@@ -178,14 +188,17 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
     # Get the full parent overdensity grid dimensions
     # (this has a 1 cell pad region)
-    ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"] + 2
+    ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"]
+
+    # Get the simulation cell dimensions
+    n_sim_cells = hdf_meta["Parent"].attrs["Ncells"]
+    cdim = int(n_sim_cells ** (1 / 3))
 
     # Get the grid cell width
     grid_cell_width = hdf_meta["Delta_grid"].attrs["Cell_Width"]
 
     # Set up full grid array
     full_grid = np.zeros((ngrid_cells[0], ngrid_cells[1], ngrid_cells[2]))
-    print(full_grid.shape)
 
     # Loop over rank files creating external links
     for other_rank in range(size):
@@ -198,24 +211,53 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
         hdf_rank = h5py.File(rankfile, "r")
 
         # Loop over groups creating external links with relative path
+        # and the full grid
         for key in hdf_rank["Cells"].keys():
+            
+            i, j, k = key.split("_")
 
             hdf_meta[key] = h5py.ExternalLink(rankfile, "/Cells/" + key)
 
             # Get this cells hdf5 group and edges
             cell_grp = hdf_rank["Cells"][key]
             edges = cell_grp.attrs["Sim_Cell_Edges"]
-
-            # Get the ijk grid coordinates associated to this cell
-            i = int(edges[0] / grid_cell_width[0]) + 1
-            j = int(edges[1] / grid_cell_width[1]) + 1
-            k = int(edges[2] / grid_cell_width[2]) + 1
-
+            
             # Get the overdensity grid and convert to mass
             grid = cell_grp["grid"][...]
+            dimens = grid.shape
 
-            full_grid[i: i + grid.shape[0], j: j + grid.shape[1],
-            k: k + grid.shape[2]] = grid
+            # Get the indices for this cell edge
+            ilow = int(edges[0] / grid_cell_width)
+            jlow = int(edges[1] / grid_cell_width)
+            klow = int(edges[2] / grid_cell_width)
+            ihigh = ilow + dimens[0]
+            jhigh = jlow + dimens[1]
+            khigh = jlow + dimens[2]
+
+            # Shift the grid coordinates to account for the padding region
+            # NOTE: These can be negative or larger than the full_grid array
+            # but are wrapped by numpy.take
+            ilow -= pad_region
+            jlow -= pad_region
+            klow -= pad_region
+            ihigh -= pad_region
+            jhigh -= pad_region
+            khigh -= pad_region
+
+            # Define indices ranges
+            irange = np.arange(ilow, ihigh, 1, dtype=int)
+            jrange = np.arange(jlow, jhigh, 1, dtype=int)
+            krange = np.arange(klow, khigh, 1, dtype=int)
+
+            # To allow for wrapping we need to assign cell by cell ( :( )
+            for i_grid, i_full in enumerate(irange):
+                for j_grid, j_full in enumerate(jrange):
+                    for k_grid, k_full in enumerate(krange):
+                        full_grid[i_full % ngrid_cells[0],
+                                  j_full % ngrid_cells[1],
+                                  k_full % ngrid_cells[2]] = grid[i_grid,
+                                                                  j_grid,
+                                                                  k_grid]
 
         hdf_rank.close()
 
@@ -227,6 +269,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank, size):
 
 
 if __name__ == "__main__":
+    
+    # Define pad region
+    pad_region = 2
 
     # Get the commandline argument for which snapshot
     num = int(sys.argv[1])
@@ -255,7 +300,8 @@ if __name__ == "__main__":
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
     # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0)
+    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0, 
+                  pad_region=pad_region)
 
     # Ensure all files are finished writing
     comm.Barrier()
