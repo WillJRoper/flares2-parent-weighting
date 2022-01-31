@@ -232,7 +232,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             klow = int(edges[2] / grid_cell_width)
             ihigh = ilow + dimens[0]
             jhigh = jlow + dimens[1]
-            khigh = jlow + dimens[2]
+            khigh = klow + dimens[2]
 
             # Shift the grid coordinates to account for the padding region
             # NOTE: These can be negative or larger than the full_grid array
