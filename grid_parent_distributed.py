@@ -236,7 +236,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 
             # Shift the grid coordinates to account for the padding region
             # NOTE: These can be negative or larger than the full_grid array
-            # but are wrapped by numpy.take
+            # but are wrapped later
             ilow -= pad_region
             jlow -= pad_region
             klow -= pad_region
@@ -280,7 +280,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 if __name__ == "__main__":
     
     # Define pad region
-    pad_region = 2
+    pad_region = 10
 
     # Get the commandline argument for which snapshot
     num = int(sys.argv[1])
@@ -317,4 +317,5 @@ if __name__ == "__main__":
 
     # Create the meta file now we have each individual rank file
     if rank == 0:
-        create_meta_file(metafile, out_dir, outfile_without_rank, size)
+        create_meta_file(metafile, out_dir, outfile_without_rank, size,
+                         pad_region=pad_region)
