@@ -227,8 +227,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 
             # Get the indices for this cell edge
             ilow = int(edges[0] / grid_cell_width[0])
-            jlow = int(edges[1] / grid_cell_width[0])
-            klow = int(edges[2] / grid_cell_width[0])
+            jlow = int(edges[1] / grid_cell_width[1])
+            klow = int(edges[2] / grid_cell_width[2])
             ihigh = ilow + dimens[0]
             jhigh = jlow + dimens[1]
             khigh = klow + dimens[2]
@@ -248,6 +248,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             if (i != 0 and i != cdim
                 and j != 0 and j != cdim
                 and k != 0 and k != cdim):
+                print(ilow, ihigh, jlow, jhigh, klow, khigh)
                 full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
 
             else:  # we must wrap
@@ -310,9 +311,9 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0, 
-                  pad_region=pad_region)
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
+    #               pad_region=pad_region)
 
     # Ensure all files are finished writing
     comm.Barrier()
