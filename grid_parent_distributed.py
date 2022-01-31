@@ -191,8 +191,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
     ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"]
 
     # Get the simulation cell dimensions
-    n_sim_cells = hdf_meta["Parent"].attrs["Ncells"]
-    cdim = int(n_sim_cells ** (1 / 3))
+    cdim = hdf_meta["Parent"].attrs["Ncells"][0]
 
     # Get the grid cell width
     grid_cell_width = hdf_meta["Delta_grid"].attrs["Cell_Width"]
