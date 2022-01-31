@@ -296,7 +296,7 @@ if __name__ == "__main__":
     sim_tag = sys.argv[2]
 
     # Extract the snapshot string
-    snaps = [str(i).zfill(4) for i in range(0, 19)]
+    snaps = [str(i).zfill(4) for i in range(0, 25)]
     snap = snaps[num]
 
     # Define input path
