@@ -213,7 +213,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
         # and the full grid
         for key in hdf_rank["Cells"].keys():
             
-            i, j, k = key.split("_")
+            # Extract sim cell grid coordinates
+            i, j, k = (int(ijk) for ijk in key.split("_"))
 
             hdf_meta[key] = h5py.ExternalLink(rankfile, "/Cells/" + key)
 
