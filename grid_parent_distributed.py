@@ -248,7 +248,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             if (i != 0 and i != cdim
                 and j != 0 and j != cdim
                 and k != 0 and k != cdim):
-                print(ilow, ihigh, jlow, jhigh, klow, khigh)
+                print(i, j, k, ilow, ihigh, jlow, jhigh, klow, khigh)
                 full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
 
             else:  # we must wrap
