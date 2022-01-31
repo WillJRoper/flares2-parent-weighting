@@ -226,9 +226,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             dimens = grid.shape
 
             # Get the indices for this cell edge
-            ilow = int(edges[0] / grid_cell_width)
-            jlow = int(edges[1] / grid_cell_width)
-            klow = int(edges[2] / grid_cell_width)
+            ilow = int(edges[0] / grid_cell_width[0])
+            jlow = int(edges[1] / grid_cell_width[0])
+            klow = int(edges[2] / grid_cell_width[0])
             ihigh = ilow + dimens[0]
             jhigh = jlow + dimens[1]
             khigh = klow + dimens[2]
