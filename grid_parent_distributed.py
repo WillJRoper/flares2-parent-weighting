@@ -60,8 +60,9 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
         print("Parent Grid NCells:", full_grid_ncells + 2)
 
     # Ensure we can wrap correctly without shifting multiple cells
-    assert pad_region < ovden_cdim, "Can't have a pad region larger than " \
-                                    "a cell due to wrapping assumptions"
+    assert np.all(pad_region < ovden_cdim), "Can't have a pad region " \
+                                            "larger than a cell due to " \
+                                            "wrapping assumptions"
 
     # Get the list of simulation cell indices and the associated ijk references
     all_cells = []
