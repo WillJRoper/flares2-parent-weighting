@@ -244,20 +244,29 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             jhigh -= pad_region
             khigh -= pad_region
 
-            # Define indices ranges
-            irange = np.arange(ilow, ihigh, 1, dtype=int)
-            jrange = np.arange(jlow, jhigh, 1, dtype=int)
-            krange = np.arange(klow, khigh, 1, dtype=int)
+            # If we are not at the edges we don't need any wrapping
+            # and can just assign the grid at once
+            if (i != 0 and i != cdim
+                and j != 0 and j != cdim
+                and k != 0 and k != cdim):
+                full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
 
-            # To allow for wrapping we need to assign cell by cell ( :( )
-            for i_grid, i_full in enumerate(irange):
-                for j_grid, j_full in enumerate(jrange):
-                    for k_grid, k_full in enumerate(krange):
-                        full_grid[i_full % ngrid_cells[0],
-                                  j_full % ngrid_cells[1],
-                                  k_full % ngrid_cells[2]] = grid[i_grid,
-                                                                  j_grid,
-                                                                  k_grid]
+            else:  # we must wrap
+
+                # Define indices ranges
+                irange = np.arange(ilow, ihigh, 1, dtype=int)
+                jrange = np.arange(jlow, jhigh, 1, dtype=int)
+                krange = np.arange(klow, khigh, 1, dtype=int)
+
+                # To allow for wrapping we need to assign cell by cell ( :( )
+                for i_grid, i_full in enumerate(irange):
+                    for j_grid, j_full in enumerate(jrange):
+                        for k_grid, k_full in enumerate(krange):
+                            full_grid[i_full % ngrid_cells[0],
+                                      j_full % ngrid_cells[1],
+                                      k_full % ngrid_cells[2]] = grid[i_grid,
+                                                                      j_grid,
+                                                                      k_grid]
 
         hdf_rank.close()
 
