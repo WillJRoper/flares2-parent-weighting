@@ -59,6 +59,10 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
               * ovden_cell_width[1] * ovden_cell_width[2])
         print("Parent Grid NCells:", full_grid_ncells + 2)
 
+    # Ensure we can wrap correctly without shifting multiple cells
+    assert pad_region < ovden_cdim, "Can't have a pad region larger than " \
+                                    "a cell due to wrapping assumptions"
+
     # Get the list of simulation cell indices and the associated ijk references
     all_cells = []
     i_s = []
@@ -126,7 +130,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
 
         if my_count > 0:
             poss = hdf["/PartType1/Coordinates"][
-                   my_offset:my_offset + my_count, :] - my_edges + (pad_region * ovden_cell_width)
+                   my_offset:my_offset + my_count, :] - my_edges \
+                   + (pad_region * ovden_cell_width)
             masses = hdf["/PartType1/Masses"][
                      my_offset:my_offset + my_count]
 
@@ -249,7 +254,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             if (i != 0 and i < cdim - 1
                 and j != 0 and j < cdim - 1
                 and k != 0 and k < cdim - 1):
-                print(i, j, k, ilow, ihigh, jlow, jhigh, klow, khigh)
+
                 full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
 
             else:  # we must wrap

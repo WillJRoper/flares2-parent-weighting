@@ -1,14 +1,14 @@
 #!/bin/bash -l
 #SBATCH --ntasks 512
 #SBATCH -N 4
-#SBATCH --array=1-20%1
+#SBATCH --array=1-20%4
 #SBATCH -J FLARES2-OVDEN-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040.%J.out
 #SBATCH -e logs/L2800N5040.%J.err
 #SBATCH -p cosma8
 #SBATCH -A dp004
 #SBATCH --exclusive
-#SBATCH -t 3:00:00
+#SBATCH -t 1:00:00
 
 module purge
 #load the modules used to build your program.
