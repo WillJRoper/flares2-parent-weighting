@@ -44,7 +44,6 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         print("Grid cells total:", ngrid_cells)
 
     # Get full parent grid
-    # NOTE: this has a 1 grid cell pad region
     ovden_grid = hdf["Parent_Grid"][...]
 
     hdf.close()
@@ -53,18 +52,11 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                             ovden_grid.shape[1] - cells_per_kernel,
                             ovden_grid.shape[2] - cells_per_kernel))
-    smooth_vals = np.zeros((ovden_grid.shape[0] - cells_per_kernel)
-                           * (ovden_grid.shape[1] - cells_per_kernel)
-                           * (ovden_grid.shape[2] - cells_per_kernel))
+    smooth_vals = np.zeros(smooth_grid[0] * smooth_grid[1] * smooth_grid[2])
 
     # Set up array to store centres and edges
-    edges = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
-                      * ovden_grid.shape[2], 3))
-    centres = np.zeros((ovden_grid.shape[0] * ovden_grid.shape[1]
-                        * ovden_grid.shape[2], 3))
-
-    # Initialise pointer to i edges of kernel in overdensity grid
-    low_i = -1
+    edges = np.zeros((smooth_vals.size, 3))
+    centres = np.zeros((smooth_vals.size, 3))
 
     # Get i coordinates for this rank
     my_is = np.linspace(0, smooth_grid.shape[0], size + 1)
@@ -72,6 +64,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                                      (my_is[rank + 1] - my_is[rank]
                                       * smooth_grid.shape[1]
                                       * smooth_grid.shape[2])))
+
+    # Initialise pointer to i edges of kernel in overdensity grid
+    low_i = -1
 
     # Loop over the smoothed cells
     ind = 0

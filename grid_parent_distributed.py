@@ -212,7 +212,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
         # Loop over groups creating external links with relative path
         # and the full grid
         for key in hdf_rank["Cells"].keys():
-            
+
             # Extract sim cell grid coordinates
             i, j, k = (int(ijk) for ijk in key.split("_"))
 
@@ -246,9 +246,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 
             # If we are not at the edges we don't need any wrapping
             # and can just assign the grid at once
-            if (i != 0 and i != cdim
-                and j != 0 and j != cdim
-                and k != 0 and k != cdim):
+            if (i != 0 and i < cdim - 1
+                and j != 0 and j < cdim - 1
+                and k != 0 and k < cdim - 1):
                 print(i, j, k, ilow, ihigh, jlow, jhigh, klow, khigh)
                 full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
 
