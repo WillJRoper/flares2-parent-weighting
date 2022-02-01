@@ -203,6 +203,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
     # Get the grid cell width
     grid_cell_width = hdf_meta["Delta_grid"].attrs["Cell_Width"]
 
+    # Get padding region in Mpc
+    pad_mpc = pad_region * grid_cell_width
+
     # Set up full grid array
     full_grid = np.zeros((ngrid_cells[0], ngrid_cells[1], ngrid_cells[2]))
 
@@ -226,7 +229,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             # Extract sim cell grid coordinates
             i, j, k = (int(ijk) for ijk in key.split("_"))
 
-            # Get this cells hdf5 group and edges
+            # Get this cell's hdf5 group and edges
             cell_grp = hdf_rank[key]
             edges = cell_grp.attrs["Sim_Cell_Edges"]
             
@@ -235,22 +238,14 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             dimens = grid.shape
 
             # Get the indices for this cell edge
-            ilow = int(edges[0] / grid_cell_width[0])
-            jlow = int(edges[1] / grid_cell_width[1])
-            klow = int(edges[2] / grid_cell_width[2])
+            # NOTE: These can be negative or larger than the full_grid array
+            # but are wrapped later
+            ilow = int((edges[0] - pad_mpc[0]) / grid_cell_width[0])
+            jlow = int((edges[1] - pad_mpc[1]) / grid_cell_width[1])
+            klow = int((edges[2] - pad_mpc[2]) / grid_cell_width[2])
             ihigh = ilow + dimens[0]
             jhigh = jlow + dimens[1]
             khigh = klow + dimens[2]
-
-            # Shift the grid coordinates to account for the padding region
-            # NOTE: These can be negative or larger than the full_grid array
-            # but are wrapped later
-            ilow -= pad_region
-            jlow -= pad_region
-            klow -= pad_region
-            ihigh -= pad_region
-            jhigh -= pad_region
-            khigh -= pad_region
 
             print(ilow, ihigh, jlow, jhigh, klow, khigh)
 
@@ -356,9 +351,9 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
-                  pad_region=pad_region)
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
+    #               pad_region=pad_region)
 
     # Ensure all files are finished writing
     comm.Barrier()
