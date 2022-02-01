@@ -55,7 +55,7 @@ ax.plot(bin_cents, H, label=sim_tag + "_" + sim_type + "_2Mpc")
 ax.set_xlabel("$1 + \delta$")
 ax.set_ylabel("$N$")
 
-fig.savefig("plots/overdensity_hist_" + snap + ".png", bbox_inches="tight")
+fig.savefig("plots/overdensity_hist_" + sim_tag + "_" + sim_type + "_" + snap + ".png", bbox_inches="tight")
 
 plt.close()
 
@@ -68,6 +68,6 @@ ax.plot(log_bin_cents, log_H, label=sim_tag + "_" + sim_type + "_2Mpc")
 ax.set_xlabel("$\log_{10}(1 + \delta)$")
 ax.set_ylabel("$N$")
 
-fig.savefig("plots/log_overdensity_hist_" + snap + ".png", bbox_inches="tight")
+fig.savefig("plots/log_overdensity_hist_" + sim_tag + "_" + sim_type + "_" + snap + ".png", bbox_inches="tight")
 
 plt.close()
