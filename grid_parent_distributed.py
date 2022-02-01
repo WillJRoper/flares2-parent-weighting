@@ -57,7 +57,8 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
         print("Grid Cell Width:", ovden_cell_width)
         print("Grid Cell Volume:", ovden_cell_width[0]
               * ovden_cell_width[1] * ovden_cell_width[2])
-        print("Parent Grid NCells:", full_grid_ncells + 2)
+        print("Cell Grid NCells:", ovden_cdim)
+        print("Parent Grid NCells:", full_grid_ncells)
 
     # Ensure we can wrap correctly without shifting multiple cells
     assert np.all(pad_region < ovden_cdim), "Can't have a pad region " \
@@ -135,11 +136,11 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
 
             # Handle the edge case where a particle has been
             # wrapped outside the box
-            poss[poss > cell_width] -= boxsize[0]
-            poss[poss < -cell_width] += boxsize[0]
+            poss[poss > boxsize] -= boxsize[0]
+            poss[poss < 0] += boxsize[0]
 
             # Compute overdensity grid ijk references
-            ovden_ijk = np.int32(poss / ovden_cell_width)
+            ovden_ijk = np.int64(poss / ovden_cell_width)
 
             # Store the mass in each grid cell
             for ii, jj, kk, m in zip(ovden_ijk[:, 0], ovden_ijk[:, 1],
