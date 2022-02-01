@@ -102,14 +102,11 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
     parent.attrs["Mean_Density"] = mean_density
 
     # Store some metadata about the overdensity grid
-    parent = hdf_out.create_group("Delta_grid")
-    parent.attrs["Cell_Width"] = ovden_cell_width
-    parent.attrs["Ncells_Total"] = full_grid_ncells
-    parent.attrs["Ncells_PerSimCell"] = ovden_cdim
-    parent.attrs["NPadding_Cells"] = pad_region
-
-    # Create cells group
-    cells_grp = hdf_out.create_group("Cells")
+    ovden_grid_grp = hdf_out.create_group("Delta_grid")
+    ovden_grid_grp.attrs["Cell_Width"] = ovden_cell_width
+    ovden_grid_grp.attrs["Ncells_Total"] = full_grid_ncells
+    ovden_grid_grp.attrs["Ncells_PerSimCell"] = ovden_cdim
+    ovden_grid_grp.attrs["NPadding_Cells"] = pad_region
 
     # Loop over cells calculating the overdensity grid
     for i, j, k, my_cell in zip(my_i_s, my_j_s, my_k_s, my_cells):
@@ -150,7 +147,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
                 mass_grid_this_cell[ii, jj, kk] += m
 
             # Convert the mass entries to overdensities
-            # (\delta(x) = (\rho(x) - \bar{\rho}) / \bar{\rho})
+            # (1 + \delta(x) = \rho(x) / \bar{\rho}
             ovden_grid_this_cell = ((mass_grid_this_cell / ovden_cell_volume)
                                     / mean_density)
 
@@ -158,11 +155,12 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
             ovden_grid_this_cell = mass_grid_this_cell
 
         # Create a group for this cell
-        this_cell = cells_grp.create_group(str(i) + "_" + str(j)
+        this_cell = hdf_out.create_group(str(i) + "_" + str(j)
                                            + "_" + str(k))
         this_cell.attrs["Sim_Cell_Index"] = my_cell
         this_cell.attrs["Sim_Cell_Edges"] = my_edges
-        this_cell.create_dataset("grid", data=ovden_grid_this_cell,
+        this_cell.create_dataset("grid",
+                                 data=ovden_grid_this_cell,
                                  shape=ovden_grid_this_cell.shape,
                                  dtype=ovden_grid_this_cell.dtype,
                                  compression="lzf")
@@ -173,7 +171,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
 
 def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
                      size, pad_region):
-    
+
     # Define padding pixels
     pad_cells = 2 * pad_region
     
@@ -196,8 +194,10 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
     # (this has a 1 cell pad region)
     ngrid_cells = hdf_meta["Delta_grid"].attrs["Ncells_Total"]
 
-    # Get the simulation cell dimensions
+    # Get the simulation cell information and grid cdim
     cdim = hdf_meta["Parent"].attrs["Ncells"][0]
+    sim_cell_width = hdf_meta["Parent"].attrs["Cell_Width"]
+    cdim_per_cell = hdf_meta["Delta_grid"].attrs["Ncells_PerSimCell"]
 
     # Get the grid cell width
     grid_cell_width = hdf_meta["Delta_grid"].attrs["Cell_Width"]
@@ -222,10 +222,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             # Extract sim cell grid coordinates
             i, j, k = (int(ijk) for ijk in key.split("_"))
 
-            hdf_meta[key] = h5py.ExternalLink(rankfile, "/Cells/" + key)
-
             # Get this cells hdf5 group and edges
-            cell_grp = hdf_rank["Cells"][key]
+            cell_grp = hdf_rank[key]
             edges = cell_grp.attrs["Sim_Cell_Edges"]
             
             # Get the overdensity grid and convert to mass
@@ -256,7 +254,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
                 and j != 0 and j < cdim - 1
                 and k != 0 and k < cdim - 1):
 
-                full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] = grid
+                full_grid[ilow: ihigh, jlow: jhigh, klow: khigh] += grid
 
             else:  # we must wrap
 
@@ -271,15 +269,41 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
                         for k_grid, k_full in enumerate(krange):
                             full_grid[i_full % ngrid_cells[0],
                                       j_full % ngrid_cells[1],
-                                      k_full % ngrid_cells[2]] = grid[i_grid,
+                                      k_full % ngrid_cells[2]] += grid[i_grid,
                                                                       j_grid,
                                                                       k_grid]
 
         hdf_rank.close()
 
-    hdf_meta.create_dataset("Parent_Grid", data=full_grid,
+    hdf_meta.create_dataset("Parent_Grid",
+                            data=full_grid,
                             shape=full_grid.shape,
                             dtype=full_grid.dtype, compression="lzf")
+
+    # Loop over cells making groups for each cell in the single file
+    for i in range(cdim):
+        for j range(cdim):
+            for k range(cdim):
+
+                # Get cell index and cell edges
+                my_cell = (k + cdim[2] * (j + cdim[1] * i))
+                my_edges = np.array([i, j, k]) * sim_cell_width
+
+                # Create a group for this cell
+                this_cell = hdf_meta.create_group(str(i) + "_" + str(j)
+                                                  + "_" + str(k))
+
+                cell_grid = full_grid[i: i + cdim_per_cell,
+                                      j: j + cdim_per_cell,
+                                      k: k + cdim_per_cell]
+
+                # Write out cell data
+                this_cell.attrs["Sim_Cell_Index"] = my_cell
+                this_cell.attrs["Sim_Cell_Edges"] = my_edges
+                this_cell.create_dataset("grid", data=cell_grid,
+                                         shape=cell_grid.shape,
+                                         dtype=cell_grid.dtype,
+                                         compression="lzf")
 
     hdf_meta.close()
 
