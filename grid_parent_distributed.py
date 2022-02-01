@@ -287,7 +287,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             for k in range(cdim):
 
                 # Get cell index and cell edges
-                my_cell = (k + cdim[2] * (j + cdim[1] * i))
+                my_cell = (k + cdim * (j + cdim * i))
                 my_edges = np.array([i, j, k]) * sim_cell_width
 
                 # Create a group for this cell
