@@ -29,14 +29,21 @@ path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
 # Open file
 hdf = h5py.File(path, "r")
 
-mean_density = hdf["Parent"].attrs["Mean_Density"]
+grid_cell_width = hdf["Delta_grid"].attrs["Cell_Width"]
+grid_cell_vol = grid_cell_width ** 3
+
+# Compute actual kernel width
+cells_per_kernel = np.int32(np.ceil(25 / grid_cell_width[0]))
+kernel_width = cells_per_kernel * grid_cell_width
+
+# Get grid
 grid = hdf["Parent_Grid"][...]
-log_grid = np.log10(grid)
+log_grid = np.log10(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1))
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-im = ax.imshow(grid, cmap="viridis")
+im = ax.imshow(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1), cmap="viridis")
 
 cbar = fig.colorbar(im)
 cbar.set_label("$(1 + \delta)$")
