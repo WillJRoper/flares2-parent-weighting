@@ -8,7 +8,7 @@
 #SBATCH -p cosma8
 #SBATCH -A dp004
 #SBATCH --exclusive
-#SBATCH -t 3:00:00
+#SBATCH -t 5:00:00
 
 module purge
 #load the modules used to build your program.
@@ -23,6 +23,7 @@ source activate flares-env
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
 mpirun -np 512 python grid_parent_distributed.py $i L2800N5040 HYDRO
+mpirun -np 512 python grid_parent_distributed.py $i L2800N5040 DMO
 
 source deactivate
 

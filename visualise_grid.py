@@ -38,9 +38,10 @@ kernel_width = cells_per_kernel * grid_cell_width
 
 # Get grid
 grid = hdf["Parent_Grid"][...]
-log_grid = np.log10(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1))
+log_grid = np.zeros_like(grid)
+log_grid[grid > 0] = np.log10(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1)[grid > 0])
 
-fig = plt.figure()
+fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 
 im = ax.imshow(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1), cmap="viridis")
@@ -53,7 +54,7 @@ fig.savefig("plots/overdensity_gird_" + sim_tag + "_" + sim_type + "_" + snap + 
 
 plt.close()
 
-fig = plt.figure()
+fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 ax.semilogy()
 

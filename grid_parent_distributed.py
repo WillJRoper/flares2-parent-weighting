@@ -327,9 +327,14 @@ if __name__ == "__main__":
     snap = snaps[num]
 
     # Define input path
-    inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" + sim_tag + "/" \
-             "" + sim_type + "_FIDUCIAL/snapshots/flamingo_" + snap \
-             + "/flamingo_" + snap + ".hdf5"
+    if sim_type == "HYDRO":
+        inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" + sim_tag + "/" \
+                 "" + sim_type + "_FIDUCIAL/snapshots/flamingo_" + snap \
+                 + "/flamingo_" + snap + ".hdf5"
+    else:
+        inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" + sim_tag + "/" \
+                 "" + sim_type + "_FIDUCIAL/flamingo_" + snap \
+                 + "/flamingo_" + snap + ".hdf5"
 
     # Define out file name
     outfile = "overdensity_" + sim_tag + "_" + sim_type + "_" \
