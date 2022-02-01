@@ -6,7 +6,7 @@ import sys
 
 
 sns.set_context("paper")
-sns.set_style('whitegrid')
+sns.set_style('white')
 
 # Get the commandline argument for which snapshot
 num = int(sys.argv[1])
@@ -37,14 +37,14 @@ cells_per_kernel = np.int32(np.ceil(25 / grid_cell_width[0]))
 kernel_width = cells_per_kernel * grid_cell_width
 
 # Get grid
-grid = hdf["Parent_Grid"][...]
+grid = np.sum(hdf["Parent_Grid"][:, :, 0: cells_per_kernel], axis=-1)
 log_grid = np.zeros_like(grid)
 log_grid[grid > 0] = np.log10(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1)[grid > 0])
 
 fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 
-im = ax.imshow(np.sum(grid[:, :, 0: cells_per_kernel], axis=-1), cmap="viridis")
+im = ax.imshow(grid, cmap="viridis")
 
 cbar = fig.colorbar(im)
 cbar.set_label("$(1 + \delta)$")
