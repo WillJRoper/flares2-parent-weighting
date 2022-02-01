@@ -22,7 +22,7 @@ source activate flares-env
 
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
-mpirun -np 512 python grid_parent_distributed.py $i L2800N5040
+mpirun -np 512 python grid_parent_distributed.py $i L2800N5040 HYDRO
 
 source deactivate
 

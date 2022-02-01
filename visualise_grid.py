@@ -21,14 +21,6 @@ sim_type = sys.argv[3]
 snaps = [str(i).zfill(4) for i in range(0, 21)]
 snap = snaps[num]
 
-# Set up bins
-step = 0.1
-bin_edges = np.arange(0.00001, 15 + step, step)
-bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.05
-log_bin_edges = np.arange(-1.0, 1.0 + step, step)
-log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
-
 # Define path to file
 metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
 path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
@@ -39,23 +31,18 @@ hdf = h5py.File(path, "r")
 
 mean_density = hdf["Parent"].attrs["Mean_Density"]
 grid = hdf["Parent_Grid"][...]
-
-# Get counts for this cell
-H, _ = np.histogram(grid, bins=bin_edges)
-
-# Get counts for this cell
-log_H, _ = np.histogram(np.log10(grid), bins=log_bin_edges)
+log_grid = np.log10(grid)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.semilogy()
 
-ax.plot(bin_cents, H, label=sim_tag + "_" + sim_type + "_2Mpc")
+im = ax.imshow(grid, cmap="viridis")
 
-ax.set_xlabel("$1 + \delta$")
-ax.set_ylabel("$N$")
+cbar = fig.colorbar(im)
+cbar.set_label("$(1 + \delta)$")
 
-fig.savefig("plots/overdensity_hist_" + snap + ".png", bbox_inches="tight")
+fig.savefig("plots/overdensity_gird_" + snap + ".png",
+            bbox_inches="tight")
 
 plt.close()
 
@@ -63,11 +50,12 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.semilogy()
 
-ax.plot(log_bin_cents, log_H, label=sim_tag + "_" + sim_type + "_2Mpc")
+im = ax.imshow(log_grid, cmap="viridis")
 
-ax.set_xlabel("$\log_{10}(1 + \delta)$")
-ax.set_ylabel("$N$")
+cbar = fig.colorbar(im)
+cbar.set_label("$\log_{10}(1 + \delta)$")
 
-fig.savefig("plots/log_overdensity_hist_" + snap + ".png", bbox_inches="tight")
+fig.savefig("plots/log_overdensity_loggrid_" + snap + ".png",
+            bbox_inches="tight")
 
 plt.close()

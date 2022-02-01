@@ -318,6 +318,9 @@ if __name__ == "__main__":
 
     # Get the simulation "tag"
     sim_tag = sys.argv[2]
+    
+    # Get the simulation "type"
+    sim_type = sys.argv[3]
 
     # Extract the snapshot string
     snaps = [str(i).zfill(4) for i in range(0, 25)]
@@ -325,18 +328,18 @@ if __name__ == "__main__":
 
     # Define input path
     inpath = "/cosma8/data/dp004/jlvc76/FLAMINGO/ScienceRuns/" + sim_tag + "/" \
-             "HYDRO_FIDUCIAL/snapshots/flamingo_" + snap \
+             "" + sim_type + "_FIDUCIAL/snapshots/flamingo_" + snap \
              + "/flamingo_" + snap + ".hdf5"
 
     # Define out file name
-    outfile = "overdensity_" + sim_tag + "_HYDRO_" \
+    outfile = "overdensity_" + sim_tag + "_" + sim_type + "_" \
               "snap%s_rank%s.hdf5" % (snap, str(rank).zfill(4))
-    metafile = "overdensity_" + sim_tag + "_HYDRO_snap%s.hdf5" % snap
-    outfile_without_rank = "overdensity_" + sim_tag + "_HYDRO_snap%s_" % snap
+    metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
+    outfile_without_rank = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s_" % snap
 
     # Define output paths
     out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
-              "overdensity_gridding/" + sim_tag + "/HYDRO/snap_" + snap
+              "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
     if not os.path.isdir(out_dir) and rank == 0:
         os.mkdir(out_dir)
     outpath = out_dir + "/" + outfile  # Combine file and path
