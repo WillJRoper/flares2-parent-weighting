@@ -33,6 +33,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
     cdim = hdf["Cells/Meta-data"].attrs["dimension"]
     ncells = hdf["/Cells/Meta-data"].attrs["nr_cells"]
     cell_width = hdf["Cells/Meta-data"].attrs["size"]
+    half_cell_width = cell_width / 2
 
     # Calculate the mean density
     tot_mass = nparts * pmass
@@ -123,9 +124,7 @@ def get_ovdengrid(filepath, outpath, size, rank, target_grid_width=2.0,
         my_count = hdf["/Cells/Counts/PartType1"][my_cell]
 
         # Define the edges of this cell with pad region
-        my_edges = np.array([(i * cell_width[0]),
-                             (j * cell_width[1]),
-                             (k * cell_width[2])])
+        my_edges = hdf["/Cells/Centres"][my_cell, :] - half_cell_width
 
         if my_count > 0:
             poss = hdf["/PartType1/Coordinates"][
@@ -312,7 +311,7 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 if __name__ == "__main__":
     
     # Define pad region
-    pad_region = 10
+    pad_region = 5
 
     # Get the commandline argument for which snapshot
     num = int(sys.argv[1])
