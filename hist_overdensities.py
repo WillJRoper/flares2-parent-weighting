@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as cm
 import seaborn as sns
 import h5py
 import sys
@@ -29,9 +28,6 @@ bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
 step = 0.05
 log_bin_edges = np.arange(-1.0, 1.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
-
-# Set up redshift norm
-norm = cm.Normalize(vmin=2, vmax=)
 
 # Define path to file
 metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
