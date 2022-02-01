@@ -285,8 +285,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 
     # Loop over cells making groups for each cell in the single file
     for i in range(cdim):
-        for j range(cdim):
-            for k range(cdim):
+        for j in range(cdim):
+            for k in range(cdim):
 
                 # Get cell index and cell edges
                 my_cell = (k + cdim[2] * (j + cdim[1] * i))
