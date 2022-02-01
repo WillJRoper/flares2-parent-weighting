@@ -249,6 +249,8 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             jhigh -= pad_region
             khigh -= pad_region
 
+            print(ilow, ihigh, jlow, jhigh, klow, khigh)
+
             # If we are not at the edges we don't need any wrapping
             # and can just assign the grid at once
             if (i != 0 and i < cdim - 1
@@ -350,10 +352,10 @@ if __name__ == "__main__":
         os.mkdir(out_dir)
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
-
-    # Get the overdensity grid for this rank
-    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
-                  pad_region=pad_region)
+    #
+    # # Get the overdensity grid for this rank
+    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
+    #               pad_region=pad_region)
 
     # Ensure all files are finished writing
     comm.Barrier()
