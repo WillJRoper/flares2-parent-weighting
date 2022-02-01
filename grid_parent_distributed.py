@@ -218,7 +218,10 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
 
         # Loop over groups creating external links with relative path
         # and the full grid
-        for key in hdf_rank["Cells"].keys():
+        for key in hdf_rank.keys():
+
+            if key in ["Parent", "Delta_grid"]:
+                continue
 
             # Extract sim cell grid coordinates
             i, j, k = (int(ijk) for ijk in key.split("_"))
