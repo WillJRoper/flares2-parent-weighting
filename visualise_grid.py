@@ -30,6 +30,9 @@ path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
 # Open file
 hdf = h5py.File(path, "r")
 
+parent = hdf["Parent"]
+boxsize = parent.attrs["Boxsize"]
+
 grid_cell_width = hdf["Delta_grid"].attrs["Cell_Width"]
 grid_cell_vol = grid_cell_width ** 3
 
@@ -39,13 +42,13 @@ kernel_width = cells_per_kernel * grid_cell_width
 
 # Get grid
 grid = np.sum(hdf["Parent_Grid"][:, :, :], axis=-1)
-log_grid = np.zeros_like(grid)
+log_grid = np.zeros(grid.shape)
 log_grid[grid > 0] = np.log10(grid[grid > 0])
 
 fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 
-im = ax.imshow(grid, cmap="viridis")
+im = ax.imshow(grid, cmap="viridis", extent=[0, boxsize, 0, boxsize])
 
 cbar = fig.colorbar(im)
 cbar.set_label("$(1 + \delta)$")
@@ -57,9 +60,8 @@ plt.close()
 
 fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
-ax.semilogy()
 
-im = ax.imshow(log_grid, cmap="viridis")
+im = ax.imshow(log_grid, cmap="viridis", extent=[0, boxsize, 0, boxsize])
 
 cbar = fig.colorbar(im)
 cbar.set_label("$\log_{10}(1 + \delta)$")
