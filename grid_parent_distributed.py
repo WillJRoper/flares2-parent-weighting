@@ -350,9 +350,9 @@ if __name__ == "__main__":
     outpath = out_dir + "/" + outfile  # Combine file and path
     ini_rankpath = out_dir + "/" + outfile_without_rank  # rankless string
 
-    # # Get the overdensity grid for this rank
-    # get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
-    #               pad_region=pad_region)
+    # Get the overdensity grid for this rank
+    get_ovdengrid(inpath, outpath, size, rank, target_grid_width=2.0,
+                  pad_region=pad_region)
 
     # Ensure all files are finished writing
     comm.Barrier()
