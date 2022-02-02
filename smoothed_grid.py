@@ -53,6 +53,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     hdf.close()
 
+    print("Read data")
+
     # Set up arrays for the smoothed grid
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                             ovden_grid.shape[1] - cells_per_kernel,
@@ -63,6 +65,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     # Set up array to store centres and edges
     edges = np.zeros((smooth_vals.size, 3))
     centres = np.zeros((smooth_vals.size, 3))
+
+    print("Created arrays:", smooth_grid.shape, smooth_vals.shape,
+                            egdes.shape, centres.shape)
 
     # Get the list of simulation cell indices and the associated ijk references
     all_cells = []
