@@ -70,28 +70,26 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                             edges.shape, centres.shape)
 
     # Get the list of simulation cell indices and the associated ijk references
-    all_cells = []
-    i_s = []
-    j_s = []
-    k_s = []
+    i_s = np.zeros(smooth_vals.size, dtype=np.int16)
+    j_s = np.zeros(smooth_vals.size, dtype=np.int16)
+    k_s = np.zeros(smooth_vals.size, dtype=np.int16)
+    ind = 0
     for i in range(smooth_grid.shape[0]):
         for j in range(smooth_grid.shape[1]):
             for k in range(smooth_grid.shape[2]):
-                cell = (k + smooth_grid.shape[2] * (j + smooth_grid.shape[1] * i))
-                all_cells.append(cell)
-                i_s.append(i)
-                j_s.append(j)
-                k_s.append(k)
+                i_s[ind] = i
+                j_s[ind] = j
+                k_s[ind] = k
+                ind += 1
 
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
-    rank_cells = np.linspace(0, len(all_cells), size + 1, dtype=int)
-    my_cells = all_cells[rank_cells[rank]: rank_cells[rank + 1]]
+    rank_cells = np.linspace(0, smooth_vals.size, size + 1, dtype=int)
     my_i_s = i_s[rank_cells[rank]: rank_cells[rank + 1]]
     my_j_s = j_s[rank_cells[rank]: rank_cells[rank + 1]]
     my_k_s = k_s[rank_cells[rank]: rank_cells[rank + 1]]
 
-    print("Rank: %d has %d cells" % (rank, len(my_cells)))
+    print("Rank: %d has %d cells" % (rank, my_i_s.size))
 
     # Loop over the smoothed cells
     smooth_cdim = smooth_grid.shape
