@@ -29,12 +29,11 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     # Open file
     hdf = h5py.File(path, "r")
 
-    # Get simulation metadata
+    # Get metadata
     boxsize = hdf["Parent"].attrs["Boxsize"]
     mean_density = hdf["Parent"].attrs["Mean_Density"]
     ngrid_cells = hdf["Delta_grid"].attrs["Ncells_Total"]
     grid_cell_width = hdf["Delta_grid"].attrs["Cell_Width"]
-    grid_cell_vol = grid_cell_width ** 3
 
     # Compute actual kernel width 
     cells_per_kernel = np.int32(np.ceil(ini_kernel_width / grid_cell_width[0]))
@@ -64,31 +63,45 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     edges = np.zeros((smooth_vals.size, 3))
     centres = np.zeros((smooth_vals.size, 3))
 
-    # Get i coordinates for this rank
-    my_is = np.linspace(0, smooth_grid.shape[0], size + 1)
-    print("Rank: %d has %d cells" % (rank,
-                                     (my_is[rank + 1] - my_is[rank]
-                                      * smooth_grid.shape[1]
-                                      * smooth_grid.shape[2])))
+    # Get the list of simulation cell indices and the associated ijk references
+    all_cells = []
+    i_s = []
+    j_s = []
+    k_s = []
+    for i in range(smooth_grid.shape[0]):
+        for j in range(smooth_grid.shape[1]):
+            for k in range(smooth_grid.shape[2]):
+                cell = (k + smooth_grid.shape[2] * (j + smooth_grid.shape[1] * i))
+                all_cells.append(cell)
+                i_s.append(i)
+                j_s.append(j)
+                k_s.append(k)
 
-    # Initialise pointer to i edges of kernel in overdensity grid
-    low_i = -1
+    # Find the cells and simulation ijk grid references
+    # that this rank has to work on
+    rank_cells = np.linspace(0, len(all_cells), size + 1, dtype=int)
+    my_cells = all_cells[rank_cells[rank]: rank_cells[rank + 1]]
+    my_i_s = i_s[rank_cells[rank]: rank_cells[rank + 1]]
+    my_j_s = j_s[rank_cells[rank]: rank_cells[rank + 1]]
+    my_k_s = k_s[rank_cells[rank]: rank_cells[rank + 1]]
+
+    print("Rank: %d has %d cells" % (rank, len(my_cells)))
 
     # Loop over the smoothed cells
     smooth_cdim = smooth_grid.shape
-    for i in range(my_is[rank], my_is[rank + 1]):
-        low_i += 1
-        low_j = -1  # initialise j edges of kernel in overdensity grid
-        for j in range(smooth_grid.shape[1]):
-            low_j += 1
-            low_k = -1  # initialise k edges of kernel in overdensity grid
-            for k in range(smooth_grid.shape[2]):
-                low_k += 1
+    for i in my_i_s:
+        low_i = i
+        for j in my_j_s:
+            low_j = j
+            for k in my_k_s:
+                low_k = k
 
                 # Get the index for this smoothed grid cell
                 ind = (k + smooth_cdim[2] * (j + smooth_cdim[1] * i))
 
-                print(i, j, k, low_i, low_j, low_k, ind)
+                print(i, j, k, low_i, low_j, low_k,
+                      low_i + cells_per_kernel, low_j + cells_per_kernel,
+                      low_k + cells_per_kernel, ind)
 
                 # Get the mean of these overdensities
                 ovden_kernel = np.mean(ovden_grid[low_i: low_i
