@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#SBATCH --ntasks 512
+#SBATCH --ntasks 256
 #SBATCH --array=1-20%4
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=4
 #SBATCH -J FLARES2-REGION-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040_regions.%J.out
 #SBATCH -e logs/L2800N5040_regions.%J.err
@@ -22,8 +22,8 @@ source activate flares-env
 
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
-mpirun -np 512 python smoothed_grid.py $i L2800N5040 HYDRO
-mpirun -np 512 python smoothed_grid.py $i L2800N5040 DMO
+mpirun -np 256 python smoothed_grid.py $i L2800N5040 HYDRO
+mpirun -np 256 python smoothed_grid.py $i L2800N5040 DMO
 
 source deactivate
 
