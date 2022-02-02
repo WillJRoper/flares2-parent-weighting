@@ -24,23 +24,24 @@ hists = {}
 
 for sim_tag in ["L2800N5040", ]:
        for sim_type in ["HYDRO", "DMO"]:
+           hists[sim_tag + "_" + sim_type] = {}
 
-              # Define path to file
-              metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
-              path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
-                     "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/" + metafile
+           # Define path to file
+           metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
+           path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+                 "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/" + metafile
 
-              # Open file
-              hdf = h5py.File(path, "r")
+           # Open file
+           hdf = h5py.File(path, "r")
 
-              mean_density = hdf["Parent"].attrs["Mean_Density"]
-              grid = hdf["Parent_Grid"][...]
+           mean_density = hdf["Parent"].attrs["Mean_Density"]
+           grid = hdf["Parent_Grid"][...]
 
-              # Get counts for this cell
-              hists[sim_tag + "_" + sim_type]["H"], _ = np.histogram(grid, bins=bin_edges)
+           # Get counts for this cell
+           hists[sim_tag + "_" + sim_type]["H"], _ = np.histogram(grid, bins=bin_edges)
 
-              # Get counts for this cell
-              hists[sim_tag + "_" + sim_type]["log_H"], _ = np.histogram(np.log10(grid), bins=log_bin_edges)
+           # Get counts for this cell
+           hists[sim_tag + "_" + sim_type]["log_H"], _ = np.histogram(np.log10(grid), bins=log_bin_edges)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
