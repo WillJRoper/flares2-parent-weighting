@@ -48,7 +48,7 @@ log_grid[grid > 0] = np.log10(grid[grid > 0])
 fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 
-im = ax.imshow(grid, cmap="viridis", extent=[0, boxsize, 0, boxsize])
+im = ax.imshow(grid, cmap="viridis", extent=[0, boxsize[0], 0, boxsize[1]])
 
 cbar = fig.colorbar(im)
 cbar.set_label("$(1 + \delta)$")
@@ -61,7 +61,7 @@ plt.close()
 fig = plt.figure(dpi=300)
 ax = fig.add_subplot(111)
 
-im = ax.imshow(log_grid, cmap="viridis", extent=[0, boxsize, 0, boxsize])
+im = ax.imshow(log_grid, cmap="viridis", extent=[0, boxsize[0], 0, boxsize[1]])
 
 cbar = fig.colorbar(im)
 cbar.set_label("$\log_{10}(1 + \delta)$")
