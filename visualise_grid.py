@@ -49,6 +49,9 @@ im = ax.imshow(grid, cmap="viridis", extent=[0, boxsize[0], 0, boxsize[1]])
 cbar = fig.colorbar(im)
 cbar.set_label("$(1 + \delta)$")
 
+ax.set_xlabel("$x / [\mathrm{cMpc}]$")
+ax.set_ylabel("$y / [\mathrm{cMpc}]$")
+
 fig.savefig("plots/overdensity_gird_" + sim_tag + "_" + sim_type + "_" + snap + ".png",
             bbox_inches="tight")
 
@@ -61,6 +64,9 @@ im = ax.imshow(log_grid, cmap="viridis", extent=[0, boxsize[0], 0, boxsize[1]])
 
 cbar = fig.colorbar(im)
 cbar.set_label("$\log_{10}(1 + \delta)$")
+
+ax.set_xlabel("$x / [\mathrm{cMpc}]$")
+ax.set_ylabel("$y / [\mathrm{cMpc}]$")
 
 fig.savefig("plots/log_overdensity_loggrid_" + sim_tag + "_" + sim_type + "_" + snap + ".png",
             bbox_inches="tight")
