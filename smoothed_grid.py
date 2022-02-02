@@ -53,8 +53,6 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     hdf.close()
 
-    print("Read data")
-
     # Set up arrays for the smoothed grid
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                             ovden_grid.shape[1] - cells_per_kernel,
@@ -66,7 +64,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     edges = np.zeros((smooth_vals.size, 3))
     centres = np.zeros((smooth_vals.size, 3))
 
-    print("Created arrays:", smooth_grid.shape, smooth_vals.shape,
+    print("Created arrays with shapes:", smooth_grid.shape, smooth_vals.shape,
                             edges.shape, centres.shape)
 
     # Get the list of simulation cell indices and the associated ijk references
@@ -85,27 +83,21 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
     rank_cells = np.linspace(0, smooth_vals.size, size + 1, dtype=int)
-    my_i_s = i_s[rank_cells[rank]: rank_cells[rank + 1]]
-    my_j_s = j_s[rank_cells[rank]: rank_cells[rank + 1]]
-    my_k_s = k_s[rank_cells[rank]: rank_cells[rank + 1]]
 
-    print("Rank: %d has %d cells" % (rank, my_i_s.size))
+    print("Rank: %d has %d cells" % (rank,
+                                     rank_cells[rank + 1] - rank_cells[rank]))
 
     # Loop over the smoothed cells
     smooth_cdim = smooth_grid.shape
-    for i in my_i_s:
+    for i in range(i_s[rank_cells[rank]], i_s[rank_cells[rank + 1]]):
         low_i = i
-        for j in my_j_s:
+        for j in range(j_s[rank_cells[rank]], j_s[rank_cells[rank + 1]]):
             low_j = j
-            for k in my_k_s:
+            for k in range(k_s[rank_cells[rank]], k_s[rank_cells[rank + 1]]):
                 low_k = k
 
                 # Get the index for this smoothed grid cell
                 ind = (k + smooth_cdim[2] * (j + smooth_cdim[1] * i))
-
-                print(i, j, k, low_i, low_j, low_k,
-                      low_i + cells_per_kernel, low_j + cells_per_kernel,
-                      low_k + cells_per_kernel, ind)
 
                 # Get the mean of these overdensities
                 ovden_kernel = np.mean(ovden_grid[low_i: low_i
