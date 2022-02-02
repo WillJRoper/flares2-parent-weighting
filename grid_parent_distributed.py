@@ -293,9 +293,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
                 this_cell = hdf_meta.create_group(str(i) + "_" + str(j)
                                                   + "_" + str(k))
 
-                cell_grid = full_grid[i: i + cdim_per_cell,
-                                      j: j + cdim_per_cell,
-                                      k: k + cdim_per_cell]
+                cell_grid = full_grid[i: i + int(cdim_per_cell[0]),
+                                      j: j + int(cdim_per_cell[1]),
+                                      k: k + int(cdim_per_cell[2])]
 
                 # Write out cell data
                 this_cell.attrs["Sim_Cell_Index"] = my_cell
