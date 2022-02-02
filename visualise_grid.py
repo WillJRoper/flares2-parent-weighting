@@ -24,7 +24,8 @@ snap = snaps[num]
 # Define path to file
 metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
 path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
-       "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/" + metafile
+       "overdensity_gridding/" + sim_tag + "/" \
+       + sim_type + "/snap_" + snap + "/" + metafile
 
 # Open file
 hdf = h5py.File(path, "r")
