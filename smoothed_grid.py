@@ -57,7 +57,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                             ovden_grid.shape[1] - cells_per_kernel,
                             ovden_grid.shape[2] - cells_per_kernel))
-    smooth_vals = np.zeros(smooth_grid[0] * smooth_grid[1] * smooth_grid[2])
+    smooth_vals = np.zeros(smooth_grid.shape[0] * smooth_grid.shape[1]
+                           * smooth_grid.shape[2])
 
     # Set up array to store centres and edges
     edges = np.zeros((smooth_vals.size, 3))
@@ -153,9 +154,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         final_smooth_grid = np.zeros((ovden_grid.shape[0] - cells_per_kernel,
                                       ovden_grid.shape[1] - cells_per_kernel,
                                       ovden_grid.shape[2] - cells_per_kernel))
-        final_smooth_vals = np.zeros(smooth_grid[0]
-                                     * smooth_grid[1]
-                                     * smooth_grid[2])
+        final_smooth_vals = np.zeros(final_smooth_grid.shape[0]
+                                     * final_smooth_grid.shape[1]
+                                     * final_smooth_grid.shape[2])
 
         # Set up array to store centres and edges
         final_edges = np.zeros((smooth_vals.size, 3))
