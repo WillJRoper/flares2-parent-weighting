@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from flare import plt as flareplt
 import h5py
 import sys
+plt.rcParams['axes.grid'] = True
 
 
 # Get the commandline argument for which snapshot
@@ -55,6 +56,8 @@ for sim_tag in ["L2800N5040", ]:
 ax.set_xlabel("$1 + \delta$")
 ax.set_ylabel("$N$")
 
+ax.legend()
+
 fig.savefig("plots/overdensity_hist_boxes_" + snap + ".png",
             bbox_inches="tight")
 
@@ -71,6 +74,8 @@ for sim_tag in ["L2800N5040", ]:
 
 ax.set_xlabel("$\log_{10}(1 + \delta)$")
 ax.set_ylabel("$N$")
+
+ax.legend()
 
 fig.savefig("plots/log_overdensity_hist_" + snap + ".png",
             bbox_inches="tight")

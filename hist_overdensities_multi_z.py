@@ -5,6 +5,7 @@ import matplotlib as mpl
 from flare import plt as flareplt
 import h5py
 import sys
+plt.rcParams['axes.grid'] = True
 
 
 # Get the simulation "tag"

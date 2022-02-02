@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from flare import plt as flareplt
 import h5py
 import sys
+plt.rcParams['axes.grid'] = True
 
 
 # Get the commandline argument for which snapshot
