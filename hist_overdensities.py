@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
+from flare import plt as flareplt
 import h5py
 import sys
 
-
-sns.set_context("paper")
-sns.set_style('whitegrid')
 
 # Get the commandline argument for which snapshot
 num = int(sys.argv[1])

@@ -2,13 +2,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as cm
 import matplotlib as mpl
-import seaborn as sns
+from flare import plt as flareplt
 import h5py
 import sys
-
-
-sns.set_context("paper")
-sns.set_style('whitegrid')
 
 
 # Get the simulation "tag"
