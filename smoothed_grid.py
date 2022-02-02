@@ -223,6 +223,12 @@ if __name__ == "__main__":
     # Get the commandline argument for which snapshot
     num = int(sys.argv[1])
 
+    # Get the simulation "tag"
+    sim_tag = sys.argv[2]
+
+    # Get the simulation "type"
+    sim_type = sys.argv[3]
+
     # Extract the snapshot string
     snaps = [str(i).zfill(4) for i in range(0, 19)]
     snap = snaps[num]
