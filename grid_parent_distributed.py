@@ -239,9 +239,9 @@ def create_meta_file(metafile, rankfile_dir, outfile_without_rank,
             # Get the indices for this cell edge
             # NOTE: These can be negative or larger than the full_grid array
             # but are wrapped later
-            ilow = i * cdim_per_cell[0]
-            jlow = j * cdim_per_cell[1]
-            klow = k * cdim_per_cell[2]
+            ilow = i * cdim_per_cell[0] - pad_region
+            jlow = j * cdim_per_cell[1] - pad_region
+            klow = k * cdim_per_cell[2] - pad_region
             ihigh = ilow + dimens[0]
             jhigh = jlow + dimens[1]
             khigh = klow + dimens[2]
