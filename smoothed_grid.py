@@ -67,7 +67,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     centres = np.zeros((smooth_vals.size, 3))
 
     print("Created arrays:", smooth_grid.shape, smooth_vals.shape,
-                            egdes.shape, centres.shape)
+                            edges.shape, centres.shape)
 
     # Get the list of simulation cell indices and the associated ijk references
     all_cells = []
