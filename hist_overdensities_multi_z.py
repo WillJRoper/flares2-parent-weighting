@@ -27,7 +27,7 @@ log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Set up redshift norm
 norm = cm.Normalize(vmin=2, vmax=15)
-cmap = cm.get_cmap('plasma', len(snaps))
+cmap = plt.get_cmap('plasma', len(snaps))
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
