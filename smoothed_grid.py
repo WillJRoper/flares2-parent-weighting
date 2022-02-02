@@ -82,7 +82,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
-    rank_cells = np.linspace(0, smooth_vals.size, size + 1, dtype=int)
+    rank_cells = np.linspace(0, smooth_vals.size - 1, size + 1, dtype=int)
 
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
