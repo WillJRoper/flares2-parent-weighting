@@ -1,6 +1,7 @@
 #!/bin/bash -l
 #SBATCH --ntasks 512
 #SBATCH --array=1-20%4
+#SBATCH --cpus-per-task=2
 #SBATCH -J FLARES2-REGION-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040_regions.%J.out
 #SBATCH -e logs/L2800N5040_regions.%J.err
