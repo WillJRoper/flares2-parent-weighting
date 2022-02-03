@@ -165,7 +165,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
         # Set up arrays for the smoothed grid
         final_region_vals = np.zeros(full_nregion_cells)
-        final_region_stds = np.zeros((final_region_vals.size, 3))
+        final_region_stds = np.zeros(final_region_vals.size)
 
         # Set up array to store centres
         final_centres = np.zeros((final_region_vals.size, 3))
