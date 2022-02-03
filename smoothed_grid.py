@@ -1,4 +1,5 @@
 import sys
+import gc
 
 import numpy as np
 import h5py
@@ -53,25 +54,16 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     hdf.close()
 
-    # Set up arrays for the region overdensities and their spread
+    # Get results array dimensions
     grid_shape = (ovden_grid.shape[0] - cells_per_kernel, 
                   ovden_grid.shape[1] - cells_per_kernel, 
                   ovden_grid.shape[2] - cells_per_kernel)
-    region_vals = np.zeros((ovden_grid.shape[0] - cells_per_kernel) 
-                           * (ovden_grid.shape[1] - cells_per_kernel)
-                           * (ovden_grid.shape[2] - cells_per_kernel))
-    region_stds = np.zeros(region_vals.size)
-
-    # Set up array to store centres 
-    centres = np.zeros((region_vals.size, 3))
-
-    print("Created arrays with shapes:", region_vals.shape, region_stds.shape, 
-          centres.shape)
+    full_nregion_cells = grid_shape[0] * grid_shape[1] * grid_shape[2]
 
     # Get the list of simulation cell indices and the associated ijk references
-    i_s = np.zeros(region_vals.size, dtype=np.int16)
-    j_s = np.zeros(region_vals.size, dtype=np.int16)
-    k_s = np.zeros(region_vals.size, dtype=np.int16)
+    i_s = np.zeros(full_nregion_cells, dtype=np.int16)
+    j_s = np.zeros(full_nregion_cells, dtype=np.int16)
+    k_s = np.zeros(full_nregion_cells, dtype=np.int16)
     ind = 0
     for i in range(grid_shape[0]):
         for j in range(grid_shape[1]):
@@ -83,12 +75,20 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
-    rank_cells = np.linspace(0, region_vals.size - 1, size + 1, dtype=int)
+    rank_cells = np.linspace(0, full_nregion_cells - 1, size + 1, dtype=int)
 
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
 
+    # Set up arrays to store this ranks results and the indices
+    # in the full array
+    region_vals = np.zeros(rank_cells[rank + 1] - rank_cells[rank])
+    region_stds = np.zeros(region_vals.size)
+    region_inds = np.zeros(region_vals.size, dtype=int)
+    centres = np.zeros((region_vals.size, 3))
+
     # Loop over the smoothed cells
+    ind = 0
     for i in range(i_s[rank_cells[rank]], i_s[rank_cells[rank + 1]]):
         low_i = i
         for j in range(j_s[rank_cells[rank]], j_s[rank_cells[rank + 1]]):
@@ -97,7 +97,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                 low_k = k
 
                 # Get the index for this smoothed grid cell
-                ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
+                full_ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
 
                 # Get the mean of these overdensities
                 ovden_kernel = np.mean(ovden_grid[low_i: low_i
@@ -121,6 +121,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                 # visualisation and array
                 region_vals[ind] = ovden_kernel
                 region_stds[ind] = ovden_kernel_std
+                region_inds[ind] = full_ind
+
+                ind += 1
 
     # Set up the outpath for each rank file
     outpath = outdir + "smoothed_" + metafile.split(".")[0] \
@@ -138,7 +141,14 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     hdf.create_dataset("Region_Centres", data=centres,
                        shape=centres.shape, dtype=centres.dtype,
                        compression="lzf")
+    hdf.create_dataset("Region_Indices", data=region_inds,
+                       shape=region_inds.shape, dtype=region_inds.dtype,
+                       compression="lzf")
     hdf.close()
+
+    # Clean up
+    del i_s, j_s, k_s, region_vals, region_stds, region_inds, centres
+    gc.collect()
 
     comm.Barrier()
 
@@ -147,13 +157,11 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         #  ========== Define arrays to store the collected results ==========
 
         # Set up arrays for the smoothed grid
-        final_region_vals = np.zeros(grid_shape[0]
-                                     * grid_shape[1]
-                                     * grid_shape[2])
-        final_region_stds = np.zeros((region_vals.size, 3))
+        final_region_vals = np.zeros(full_nregion_cells)
+        final_region_stds = np.zeros((final_region_vals.size, 3))
 
         # Set up array to store centres
-        final_centres = np.zeros((region_vals.size, 3))
+        final_centres = np.zeros((final_region_vals.size, 3))
 
         # Set up the outpaths
         outpath = outdir + "smoothed_" + metafile.split(".")[0] \
@@ -180,11 +188,14 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
             hdf_rank = h5py.File(rank_outpath, "r")  # open rank 0 file
 
+            # Get indices
+            inds = hdf_rank["Region_Indices"][...]
+
             # Combine this rank's results into the final array
-            final_region_vals += hdf_rank["Region_Overdensity"][...]
+            final_region_vals[inds] += hdf_rank["Region_Overdensity"][...]
             
-            final_region_stds += hdf_rank["Region_Overdensity_Stdev"][...]
-            final_centres += hdf_rank["Region_Centres"][...]
+            final_region_stds[inds] += hdf_rank["Region_Overdensity_Stdev"][...]
+            final_centres[inds] += hdf_rank["Region_Centres"][...]
 
             hdf_rank.close()
 
