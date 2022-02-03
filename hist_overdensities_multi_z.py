@@ -39,6 +39,8 @@ ax_log.semilogy()
 
 for snap in snaps:
 
+       print(snap)
+
        # Define path to file
        metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
        path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
