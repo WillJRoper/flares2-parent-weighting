@@ -50,9 +50,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         print("Grid cells total:", ngrid_cells)
 
     # Get full parent grid
-    ovden_grid = hdf["Parent_Grid"][...]
-
-    hdf.close()
+    ovden_grid = hdf["Parent_Grid"]
 
     # Get results array dimensions
     grid_shape = (ovden_grid.shape[0] - cells_per_kernel, 
@@ -87,14 +85,25 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     region_inds = np.zeros(region_vals.size, dtype=int)
     centres = np.zeros((region_vals.size, 3))
 
+    # Get only the cells of the grid this rank needs
+    ovden_grid = hdf["Parent_Grid"][
+                 i_s[rank_cells[rank]]:
+                 i_s[rank_cells[rank + 1]] + cells_per_kernel,
+                 j_s[rank_cells[rank]]:
+                 j_s[rank_cells[rank + 1]] + cells_per_kernel,
+                 k_s[rank_cells[rank]]:
+                 k_s[rank_cells[rank + 1]] + cells_per_kernel]
+
+    hdf.close()
+
     # Loop over the smoothed cells
     ind = 0
     for i in range(i_s[rank_cells[rank]], i_s[rank_cells[rank + 1]]):
-        low_i = i
+        low_i = i - i_s[rank_cells[rank]]
         for j in range(j_s[rank_cells[rank]], j_s[rank_cells[rank + 1]]):
-            low_j = j
+            low_j = j - j_s[rank_cells[rank]]
             for k in range(k_s[rank_cells[rank]], k_s[rank_cells[rank + 1]]):
-                low_k = k
+                low_k = k - k_s[rank_cells[rank]]
 
                 # Get the index for this smoothed grid cell
                 full_ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
