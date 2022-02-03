@@ -28,8 +28,8 @@ zs = [15, 12.26, 10.38, 9.51, 8.7, 7.95, 7.26, 6.63, 6.04, 5.50, 5.0, 4.75,
 step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.05
-log_bin_edges = np.arange(-1.0, 3.0 + step, step)
+step = 0.04
+log_bin_edges = np.arange(-3.0, 3.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Set up redshift norm
@@ -58,8 +58,6 @@ for num, snap in enumerate(snaps):
        grid = hdf["Region_Overdensity"][...]
 
        hdf.close()
-
-       print(snap, z, grid[grid == 0].size, grid[grid != 0].size)
 
        # Get counts for this cell
        log_H, _ = np.histogram(np.log10(grid), bins=log_bin_edges)

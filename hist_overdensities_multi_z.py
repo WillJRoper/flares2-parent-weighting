@@ -21,8 +21,8 @@ snaps = [str(i).zfill(4) for i in range(0, 20)]
 step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.05
-log_bin_edges = np.arange(-1.0, 3.0 + step, step)
+step = 0.04
+log_bin_edges = np.arange(-3.0, 3.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Set up redshift norm
