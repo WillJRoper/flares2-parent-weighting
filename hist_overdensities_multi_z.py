@@ -21,8 +21,8 @@ snaps = [str(i).zfill(4) for i in range(0, 20)]
 step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.01
-log_bin_edges = np.arange(-1.0, 1.0 + step, step)
+step = 0.05
+log_bin_edges = np.arange(-1.0, 3.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Set up redshift norm
@@ -82,7 +82,8 @@ plt.close(fig)
 ax2_log = fig_log.add_axes([0.95, 0.1, 0.015, 0.8])
 cb1 = mpl.colorbar.ColorbarBase(ax2_log, cmap=cmap,
                                 norm=norm)
+cb1.set_label("$z$")
 
-fig_log.savefig("plots/log_overden_hist_" + sim_tag + "_" + sim_type + ".png",
+fig_log.savefig("plots/log_overden_multiz_" + sim_tag + "_" + sim_type + ".png",
                 bbox_inches="tight")
 plt.close(fig_log)

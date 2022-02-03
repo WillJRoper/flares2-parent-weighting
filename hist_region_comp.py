@@ -90,7 +90,7 @@ for sim_tag in ["L2800N5040", ]:
 ax.set_xlabel("$\log_{10}(1 + \delta)$")
 ax.set_ylabel("$N$")
 
-ax.legend()
+ax.legend(loc="upper right")
 
 fig.savefig("plots/log_region_hist_" + snap + ".png",
             bbox_inches="tight")

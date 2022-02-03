@@ -55,7 +55,7 @@ ax.set_ylabel("$\sigma(1 + \delta)$")
 cbar = fig.colorbar(im)
 cbar.set_label("$N$")
 
-fig.savefig("plots/region_spread_" + snap + ".png",
+fig.savefig("plots/region_spread_kernel" + str(ini_kernel_width) + "_" + snap + ".png",
             bbox_inches="tight")
 
 plt.close()
