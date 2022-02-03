@@ -45,7 +45,7 @@ fig = plt.figure()
 ax = fig.add_subplot(111)
 
 im = ax.hexbin(np.log10(grid), grid_std,
-               norm=cm.LogNorm,
+               norm=cm.LogNorm(),
                gridsize=100, mincnt=1,
                linewidths=0.2, cmap='viridis')
 
