@@ -58,18 +58,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                   ovden_grid.shape[2] - cells_per_kernel)
     full_nregion_cells = grid_shape[0] * grid_shape[1] * grid_shape[2]
 
-    # Get the list of simulation cell indices and the associated ijk references
-    i_s = np.zeros(full_nregion_cells, dtype=np.int16)
-    j_s = np.zeros(full_nregion_cells, dtype=np.int16)
-    k_s = np.zeros(full_nregion_cells, dtype=np.int16)
-    ind = 0
-    for i in range(grid_shape[0]):
-        for j in range(grid_shape[1]):
-            for k in range(grid_shape[2]):
-                i_s[ind] = i
-                j_s[ind] = j
-                k_s[ind] = k
-                ind += 1
+    if rank == 0:
+        print("Number of regions:", full_nregion_cells)
 
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
@@ -77,6 +67,14 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
+    
+    # Get the upper and lower grid coordinates for this rank
+    my_lowi = rank_cells[rank] / (ovden_grid.shape[1] * ovden_grid.shape[2])
+    my_lowj = (rank_cells[rank] / ovden_grid.shape[2]) % ovden_grid.shape[1]
+    my_lowk = rank_cells[rank] % ovden_grid.shape[2]
+    my_highi = rank_cells[rank + 1] / (ovden_grid.shape[1] * ovden_grid.shape[2])
+    my_highj = (rank_cells[rank + 1] / ovden_grid.shape[2]) % ovden_grid.shape[1]
+    my_highk = rank_cells[rank + 1] % ovden_grid.shape[2]
 
     # Set up arrays to store this ranks results and the indices
     # in the full array
@@ -86,26 +84,23 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     centres = np.zeros((region_vals.size, 3))
 
     # Get only the cells of the grid this rank needs
-    ovden_grid = hdf["Parent_Grid"][
-                 i_s[rank_cells[rank]]:
-                 i_s[rank_cells[rank + 1]] + cells_per_kernel,
-                 j_s[rank_cells[rank]]:
-                 j_s[rank_cells[rank + 1]] + cells_per_kernel,
-                 k_s[rank_cells[rank]]:
-                 k_s[rank_cells[rank + 1]] + cells_per_kernel]
+    ovden_grid = ovden_grid[
+                 my_lowi: my_highi + cells_per_kernel,
+                 my_lowj: my_highj + cells_per_kernel,
+                 my_lowk: my_highk + cells_per_kernel]
 
     hdf.close()
 
-    # Loop over the smoothed cells
+    # Loop over the region kernels
     ind = 0
-    for i in range(i_s[rank_cells[rank]], i_s[rank_cells[rank + 1]]):
-        low_i = i - i_s[rank_cells[rank]]
-        for j in range(j_s[rank_cells[rank]], j_s[rank_cells[rank + 1]]):
-            low_j = j - j_s[rank_cells[rank]]
-            for k in range(k_s[rank_cells[rank]], k_s[rank_cells[rank + 1]]):
-                low_k = k - k_s[rank_cells[rank]]
+    for i in range(my_lowi, my_highi):
+        low_i = i - my_lowi
+        for j in range(my_lowj, my_highj):
+            low_j = j - my_lowj
+            for k in range(my_lowk, my_highk):
+                low_k = k - my_lowk
 
-                # Get the index for this smoothed grid cell
+                # Get the index for this smoothed grid cell in the full grid
                 full_ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
 
                 # Get the mean of these overdensities
@@ -115,6 +110,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                                                          + cells_per_kernel,
                                                   low_k: low_k
                                                          + cells_per_kernel])
+
+                # Get the standard deviation of this region
                 ovden_kernel_std = np.std(ovden_grid[
                                           low_i: low_i + cells_per_kernel,
                                           low_j: low_j + cells_per_kernel,
@@ -126,8 +123,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                                   k * grid_cell_width[2]])
                 centres[ind, :] = edges + (kernel_width / 2)
 
-                # Store smoothed value in both the grid for
-                # visualisation and array
+                # Store the results and index
                 region_vals[ind] = ovden_kernel
                 region_stds[ind] = ovden_kernel_std
                 region_inds[ind] = full_ind
@@ -156,7 +152,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     hdf.close()
 
     # Clean up
-    del i_s, j_s, k_s, region_vals, region_stds, region_inds, centres
+    del region_vals, region_stds, region_inds, centres, ovden_grid
     gc.collect()
 
     comm.Barrier()
