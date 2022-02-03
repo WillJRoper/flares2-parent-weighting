@@ -134,8 +134,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                                   low_j: low_j + cells_per_kernel,
                                   low_k: low_k + cells_per_kernel])
 
-        print(low_i, low_j, low_k, full_ind, ovden_kernel,
-              ovden_kernel_std)
+        # print(low_i, low_j, low_k, full_ind, ovden_kernel,
+        #       ovden_kernel_std)
 
         # Store edges
         edges = np.array([i * grid_cell_width[0],
