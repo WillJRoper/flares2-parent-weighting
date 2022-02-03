@@ -30,7 +30,7 @@ outdir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
 
 # Define path to file
 file = "smoothed_" + metafile.split(".")[
-   0] + "_kernel%d.hdf5" % k
+   0] + "_kernel%d.hdf5" % ini_kernel_width
 path = outdir + file
 
 # Open file
