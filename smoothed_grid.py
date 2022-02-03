@@ -112,9 +112,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                                           low_k: low_k + cells_per_kernel])
 
                 # Store edges
-                edges = np.array([i * grid_cell_width, 
-                                  j * grid_cell_width, 
-                                  k * grid_cell_width])
+                edges = np.array([i * grid_cell_width[0],
+                                  j * grid_cell_width[1],
+                                  k * grid_cell_width[2]])
                 centres[ind, :] = edges + (kernel_width / 2)
 
                 # Store smoothed value in both the grid for
