@@ -28,6 +28,8 @@ for sim_tag in ["L2800N5040", ]:
            for k in [2, 25]:
                hists[sim_tag + "_" + sim_type + "_" + str(k) + "Mpc"] = {}
 
+               print(sim_tag, sim_type, k)
+
                if k == 2:
 
                    # Define path to file

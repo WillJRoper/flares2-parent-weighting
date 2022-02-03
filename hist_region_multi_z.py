@@ -14,6 +14,10 @@ sim_tag = sys.argv[1]
 # Get the simulation "type"
 sim_type = sys.argv[2]
 
+# Define kernel width
+ini_kernel_width = int(sys.argv[3])
+
+
 # Extract the snapshot string
 snaps = [str(i).zfill(4) for i in range(0, 20)]
 
@@ -24,9 +28,6 @@ bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
 step = 0.01
 log_bin_edges = np.arange(-1.0, 1.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
-
-# Define kernel width
-ini_kernel_width = int(sys.argv[3])
 
 # Set up redshift norm
 norm = cm.Normalize(vmin=2, vmax=15)
