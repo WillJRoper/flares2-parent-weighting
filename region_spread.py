@@ -49,7 +49,7 @@ hdf.close()
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-print(grid[grid == 0].size, grid[grid > 0].size)
+print(np.where(grid == 0))
 
 im = ax.hexbin(np.log10(grid), grid_std,
                norm=cm.LogNorm(),
