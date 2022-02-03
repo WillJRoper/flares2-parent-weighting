@@ -1,10 +1,9 @@
-import sys
 import gc
+import sys
 
-import numpy as np
 import h5py
+import numpy as np
 from mpi4py import MPI
-
 
 # Initializations and preliminaries
 comm = MPI.COMM_WORLD  # get MPI communicator object
@@ -14,7 +13,6 @@ status = MPI.Status()  # get MPI status object
 
 
 def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
-
     # Get the simulation "tag"
     sim_tag = sys.argv[2]
 
@@ -53,8 +51,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     ovden_grid = hdf["Parent_Grid"]
 
     # Get results array dimensions
-    grid_shape = (ovden_grid.shape[0] - cells_per_kernel, 
-                  ovden_grid.shape[1] - cells_per_kernel, 
+    grid_shape = (ovden_grid.shape[0] - cells_per_kernel,
+                  ovden_grid.shape[1] - cells_per_kernel,
                   ovden_grid.shape[2] - cells_per_kernel)
     full_nregion_cells = grid_shape[0] * grid_shape[1] * grid_shape[2]
 
@@ -67,14 +65,18 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
-    
+
     # Get the upper and lower grid coordinates for this rank
-    my_lowi = rank_cells[rank] / (ovden_grid.shape[1] * ovden_grid.shape[2])
-    my_lowj = (rank_cells[rank] / ovden_grid.shape[2]) % ovden_grid.shape[1]
-    my_lowk = rank_cells[rank] % ovden_grid.shape[2]
-    my_highi = rank_cells[rank + 1] / (ovden_grid.shape[1] * ovden_grid.shape[2])
-    my_highj = (rank_cells[rank + 1] / ovden_grid.shape[2]) % ovden_grid.shape[1]
-    my_highk = rank_cells[rank + 1] % ovden_grid.shape[2]
+    my_lowi = int(
+        rank_cells[rank] / (ovden_grid.shape[1] * ovden_grid.shape[2]))
+    my_lowj = int(
+        (rank_cells[rank] / ovden_grid.shape[2]) % ovden_grid.shape[1])
+    my_lowk = int(rank_cells[rank] % ovden_grid.shape[2])
+    my_highi = int(
+        rank_cells[rank + 1] / (ovden_grid.shape[1] * ovden_grid.shape[2]))
+    my_highj = int(
+        (rank_cells[rank + 1] / ovden_grid.shape[2]) % ovden_grid.shape[1])
+    my_highk = int(rank_cells[rank + 1] % ovden_grid.shape[2])
 
     # Set up arrays to store this ranks results and the indices
     # in the full array
@@ -106,10 +108,10 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
                 # Get the mean of these overdensities
                 ovden_kernel = np.mean(ovden_grid[low_i: low_i
                                                          + cells_per_kernel,
-                                                  low_j: low_j
-                                                         + cells_per_kernel,
-                                                  low_k: low_k
-                                                         + cells_per_kernel])
+                                       low_j: low_j
+                                              + cells_per_kernel,
+                                       low_k: low_k
+                                              + cells_per_kernel])
 
                 # Get the standard deviation of this region
                 ovden_kernel_std = np.std(ovden_grid[
@@ -172,7 +174,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         outpath = outdir + "smoothed_" + metafile.split(".")[0] \
                   + "_kernel%d.hdf5" % ini_kernel_width
         outpath0 = outdir + "smoothed_" + metafile.split(".")[0] \
-                  + "_kernel%d_rank0.hdf5" % ini_kernel_width
+                   + "_kernel%d_rank0.hdf5" % ini_kernel_width
 
         # Open file to combine results
         hdf = h5py.File(outpath, "w")
@@ -185,9 +187,8 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
         hdf_rank0.close()
 
         for other_rank in range(size):
-
             # Set up the outpath for each rank file
-            rank_outpath = outdir + "smoothed_" + metafile.split(".")[0]\
+            rank_outpath = outdir + "smoothed_" + metafile.split(".")[0] \
                            + "_kernel%d_rank%d.hdf5" % (ini_kernel_width,
                                                         other_rank)
 
@@ -198,8 +199,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
             # Combine this rank's results into the final array
             final_region_vals[inds] += hdf_rank["Region_Overdensity"][...]
-            
-            final_region_stds[inds] += hdf_rank["Region_Overdensity_Stdev"][...]
+
+            final_region_stds[inds] += hdf_rank["Region_Overdensity_Stdev"][
+                ...]
             final_centres[inds] += hdf_rank["Region_Centres"][...]
 
             hdf_rank.close()
@@ -224,7 +226,6 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
 
 if __name__ == "__main__":
-
     # Get the commandline argument for which snapshot
     num = int(sys.argv[1])
 
@@ -245,5 +246,3 @@ if __name__ == "__main__":
     # Run smoothing
     ini_kernel_width = 25  # in cMpc
     get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size)
-
-
