@@ -54,12 +54,12 @@ for num, snap in enumerate(snaps):
        # Open file
        hdf = h5py.File(path, "r")
 
-       z = [num]
+       z = zs[num]
        grid = hdf["Region_Overdensity"][...]
 
        hdf.close()
 
-       print(snap, z)
+       print(snap, z, grid[grid == 0].size)
 
        # Get counts for this cell
        log_H, _ = np.histogram(np.log10(grid), bins=log_bin_edges)
