@@ -59,7 +59,7 @@ for num, snap in enumerate(snaps):
 
        hdf.close()
 
-       print(snap, z, grid[grid == 0].size)
+       print(snap, z, grid[grid == 0].size, grid[grid != 0].size)
 
        # Get counts for this cell
        log_H, _ = np.histogram(np.log10(grid), bins=log_bin_edges)
