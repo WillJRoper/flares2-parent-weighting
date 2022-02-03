@@ -39,8 +39,6 @@ ax_log.semilogy()
 
 for snap in snaps:
 
-       print(snap)
-
        # Define output paths
        metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
        outdir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
@@ -57,6 +55,8 @@ for snap in snaps:
        grid = hdf["Region_Overdensity"][...]
 
        hdf.close()
+
+       print(snap, z)
 
        # Get counts for this cell
        log_H, _ = np.histogram(np.log10(grid), bins=log_bin_edges)
