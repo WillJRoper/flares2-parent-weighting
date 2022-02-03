@@ -75,7 +75,7 @@ cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap,
                                 norm=norm)
 
 fig.savefig(
-       "plots/overden_hist_" + sim_tag + "_" + sim_type + ".png",
+       "plots/overden_hist_multiz_" + sim_tag + "_" + sim_type + ".png",
        bbox_inches="tight")
 plt.close(fig)
 
