@@ -38,6 +38,8 @@ for sim_tag in ["L2800N5040", ]:
            mean_density = hdf["Parent"].attrs["Mean_Density"]
            grid = hdf["Parent_Grid"][...]
 
+           hdf.close()
+
            # Get counts for this cell
            hists[sim_tag + "_" + sim_type]["H"], _ = np.histogram(grid, bins=bin_edges)
 

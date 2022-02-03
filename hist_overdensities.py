@@ -38,6 +38,8 @@ hdf = h5py.File(path, "r")
 mean_density = hdf["Parent"].attrs["Mean_Density"]
 grid = hdf["Parent_Grid"][...]
 
+hdf.close()
+
 # Get counts for this cell
 H, _ = np.histogram(grid, bins=bin_edges)
 
