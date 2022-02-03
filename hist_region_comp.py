@@ -11,7 +11,11 @@ num = int(sys.argv[1])
 
 # Extract the snapshot string
 snaps = [str(i).zfill(4) for i in range(0, 21)]
+zs = [15, 12.26, 10.38, 9.51, 8.7, 7.95, 7.26, 6.63, 6.04, 5.50, 5.0, 4.75,
+      4.5, 4.25, 2.0, 3.75, 3.5, 3.25, 3.0, 2.95, 2.90, 2.85, 2.8, 2.75,
+      2.7, 2.65, 2.6, 2.55, 2.5]
 snap = snaps[num]
+z = zs[num]
 
 # Set up bins
 step = 0.1
@@ -89,6 +93,12 @@ for sim_tag in ["L2800N5040", ]:
 
 ax.set_xlabel("$\log_{10}(1 + \delta)$")
 ax.set_ylabel("$N$")
+
+ax.text(0.95, 0.05, f'$z={z}$',
+        bbox=dict(boxstyle="round,pad=0.3", fc='w',
+                  ec="k", lw=1, alpha=0.8),
+        transform=ax.transAxes,
+        horizontalalignment='right')
 
 ax.legend(loc="upper right")
 
