@@ -15,7 +15,7 @@ sim_tag = sys.argv[1]
 sim_type = sys.argv[2]
 
 # Extract the snapshot string
-snaps = [str(i).zfill(4) for i in range(0, 21)]
+snaps = [str(i).zfill(4) for i in range(0, 20)]
 
 # Set up bins
 step = 0.1
