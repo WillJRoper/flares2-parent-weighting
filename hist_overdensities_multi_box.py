@@ -18,7 +18,7 @@ step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
 step = 0.05
-log_bin_edges = np.arange(-1.0, 1.0 + step, step)
+log_bin_edges = np.arange(-1.0, 3.0 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 hists = {}
