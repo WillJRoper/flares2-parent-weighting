@@ -85,55 +85,82 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     region_inds = np.zeros(region_vals.size, dtype=int)
     centres = np.zeros((region_vals.size, 3))
 
+    # Find the minimum and maximum i, j and k to slice main grid
+    min_i, min_j, min_k = np.inf, np.inf, np.inf
+    max_i, max_j, max_k = 0, 0, 0
+    for cid in range(rank_cells[rank], rank_cells[rank + 1]):
+        i = int(cid / (full_nregion_cells * full_nregion_cells))
+        j = int((cid / full_nregion_cells) % full_nregion_cells)
+        k = int(cid % full_nregion_cells)
+        if i < min_i:
+            min_i = i
+        if i > max_i:
+            max_i = i
+        if j < min_j:
+            min_j = j
+        if j > max_j:
+            max_j = j
+        if k < min_k:
+            min_k = k
+        if k > max_k:
+            max_k = k
+
+    print("Rank=%d has cells in range [%d-%d, %d-%d, %d-%d]"
+          % (rank, min_i, max_i, min_j, max_j, min_k, max_k))
+
     # Get only the cells of the grid this rank needs
     ovden_grid = ovden_grid[
-                 my_lowi: my_highi + cells_per_kernel,
-                 my_lowj: my_highj + cells_per_kernel,
-                 my_lowk: my_highk + cells_per_kernel]
+                 min_i: max_i + cells_per_kernel,
+                 min_j: max_j + cells_per_kernel,
+                 min_k: max_k + cells_per_kernel]
 
     hdf.close()
 
     # Loop over the region kernels
     ind = 0
-    for i in range(my_lowi, my_highi):
-        low_i = i - my_lowi
-        for j in range(my_lowj, my_highj):
-            low_j = j - my_lowj
-            for k in range(my_lowk, my_highk):
-                low_k = k - my_lowk
+    for cid in range(rank_cells[rank], rank_cells[rank + 1]):
+        # Get the upper and lower grid coordinates for this rank
+        i = int(cid / (grid_shape[1] * grid_shape[2]))
+        j = int((cid / grid_shape[2]) % grid_shape[1])
+        k = int(cid % grid_shape[2])
 
-                # Get the index for this smoothed grid cell in the full grid
-                full_ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
+        # Shift is for this ranks subsample of the grid
+        low_i = i - min_i
+        low_j = j - min_j
+        low_k = k - min_k
 
-                # Get the mean of these overdensities
-                ovden_kernel = np.mean(ovden_grid[low_i: low_i
-                                                         + cells_per_kernel,
-                                       low_j: low_j
-                                              + cells_per_kernel,
-                                       low_k: low_k
-                                              + cells_per_kernel])
+        # Get the index for this smoothed grid cell in the full grid
+        full_ind = (k + grid_shape[2] * (j + grid_shape[1] * i))
 
-                # Get the standard deviation of this region
-                ovden_kernel_std = np.std(ovden_grid[
-                                          low_i: low_i + cells_per_kernel,
-                                          low_j: low_j + cells_per_kernel,
-                                          low_k: low_k + cells_per_kernel])
+        # Get the mean of these overdensities
+        ovden_kernel = np.mean(ovden_grid[low_i: low_i
+                                                 + cells_per_kernel,
+                               low_j: low_j
+                                      + cells_per_kernel,
+                               low_k: low_k
+                                      + cells_per_kernel])
 
-                print(low_i, low_j, low_k, full_ind, ovden_kernel,
-                      ovden_kernel_std)
+        # Get the standard deviation of this region
+        ovden_kernel_std = np.std(ovden_grid[
+                                  low_i: low_i + cells_per_kernel,
+                                  low_j: low_j + cells_per_kernel,
+                                  low_k: low_k + cells_per_kernel])
 
-                # Store edges
-                edges = np.array([i * grid_cell_width[0],
-                                  j * grid_cell_width[1],
-                                  k * grid_cell_width[2]])
-                centres[ind, :] = edges + (kernel_width / 2)
+        print(low_i, low_j, low_k, full_ind, ovden_kernel,
+              ovden_kernel_std)
 
-                # Store the results and index
-                region_vals[ind] = ovden_kernel
-                region_stds[ind] = ovden_kernel_std
-                region_inds[ind] = full_ind
+        # Store edges
+        edges = np.array([i * grid_cell_width[0],
+                          j * grid_cell_width[1],
+                          k * grid_cell_width[2]])
+        centres[ind, :] = edges + (kernel_width / 2)
 
-                ind += 1
+        # Store the results and index
+        region_vals[ind] = ovden_kernel
+        region_stds[ind] = ovden_kernel_std
+        region_inds[ind] = full_ind
+
+        ind += 1
 
     # Set up the outpath for each rank file
     outpath = outdir + "smoothed_" + metafile.split(".")[0] \
