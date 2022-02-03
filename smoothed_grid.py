@@ -66,18 +66,6 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
 
-    # Get the upper and lower grid coordinates for this rank
-    my_lowi = int(
-        rank_cells[rank] / (ovden_grid.shape[1] * ovden_grid.shape[2]))
-    my_lowj = int(
-        (rank_cells[rank] / ovden_grid.shape[2]) % ovden_grid.shape[1])
-    my_lowk = int(rank_cells[rank] % ovden_grid.shape[2])
-    my_highi = int(
-        rank_cells[rank + 1] / (ovden_grid.shape[1] * ovden_grid.shape[2]))
-    my_highj = int(
-        (rank_cells[rank + 1] / ovden_grid.shape[2]) % ovden_grid.shape[1])
-    my_highk = int(rank_cells[rank + 1] % ovden_grid.shape[2])
-
     # Set up arrays to store this ranks results and the indices
     # in the full array
     region_vals = np.zeros(rank_cells[rank + 1] - rank_cells[rank])
@@ -89,9 +77,9 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     min_i, min_j, min_k = np.inf, np.inf, np.inf
     max_i, max_j, max_k = 0, 0, 0
     for cid in range(rank_cells[rank], rank_cells[rank + 1]):
-        i = int(cid / (full_nregion_cells * full_nregion_cells))
-        j = int((cid / full_nregion_cells) % full_nregion_cells)
-        k = int(cid % full_nregion_cells)
+        i = int(cid / (grid_shape[1] * grid_shape[2]))
+        j = int((cid / grid_shape[2]) % grid_shape[1])
+        k = int(cid % grid_shape[2])
         if i < min_i:
             min_i = i
         if i > max_i:
