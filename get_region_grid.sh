@@ -1,6 +1,6 @@
 #!/bin/bash -l
-#SBATCH --ntasks 512
-# #SBATCH --array=1-20%4
+#SBATCH --ntasks 1024
+#SBATCH --array=1-20%10
 #SBATCH --cpus-per-task=1
 #SBATCH -J FLARES2-REGION-GRID-L2800N5040
 #SBATCH -o logs/L2800N5040_regions.%J.out
@@ -20,10 +20,10 @@ cd /cosma/home/dp004/dc-rope1/FLARES/FLARES-2-codes/flares2-parent-weighting
 
 source activate flares-env
 
-#i=$(($SLURM_ARRAY_TASK_ID - 1))
+i=$(($SLURM_ARRAY_TASK_ID - 1))
 
-mpirun -np 512 python smoothed_grid.py 3 L2800N5040 HYDRO
-mpirun -np 512 python smoothed_grid.py 3 L2800N5040 DMO
+mpirun -np 1024 python smoothed_grid.py $i L2800N5040 HYDRO
+mpirun -np 1024 python smoothed_grid.py $i L2800N5040 DMO
 
 source deactivate
 
