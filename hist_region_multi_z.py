@@ -71,6 +71,7 @@ ax_log.set_ylabel("$N$")
 ax2_log = fig_log.add_axes([0.95, 0.1, 0.015, 0.8])
 cb1 = mpl.colorbar.ColorbarBase(ax2_log, cmap=cmap,
                                 norm=norm)
+cb1.set_label("$z$")
 
 fig_log.savefig("plots/log_region_multiz_" + str(ini_kernel_width) + "_"  + sim_tag + "_" + sim_type + ".png",
                 bbox_inches="tight")
