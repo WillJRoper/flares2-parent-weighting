@@ -166,6 +166,15 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
     hdf.create_dataset("Region_Indices", data=region_inds,
                        shape=region_inds.shape, dtype=region_inds.dtype,
                        compression="lzf")
+
+    hdf_grid = h5py.File(path, "r")
+
+    for root_key in ["Parent", "Delta_grid"]:
+        for key in hdf_grid[root_key].attrs.keys():
+            hdf.attrs[root_key + "_" + key] = hdf_grid[root_key].attrs[key]
+
+    hdf_grid.close()
+
     hdf.close()
 
     # Clean up
@@ -223,7 +232,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
             hdf_rank.close()
 
         sinds = np.argsort(final_region_vals)
-            
+
         hdf.create_dataset("Sorted_Indices",
                            data=sinds,
                            shape=sinds.shape,
@@ -259,7 +268,7 @@ if __name__ == "__main__":
     sim_type = sys.argv[3]
 
     # Extract the snapshot string
-    snaps = [str(i).zfill(4) for i in range(0, 19)]
+    snaps = [str(i).zfill(4) for i in range(0, 23)]
     snap = snaps[num]
 
     # Define output paths
