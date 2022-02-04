@@ -57,6 +57,8 @@ for num, snap in enumerate(snaps):
        z = zs[num]
        grid = hdf["Region_Overdensity"][...]
 
+       print(snap, z)
+
        hdf.close()
 
        # Get counts for this cell
