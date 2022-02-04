@@ -2,6 +2,7 @@ import sys
 
 import numpy as np
 import h5py
+from scipy.spatial import cKDTree
 
 
 # Set the seed
@@ -42,7 +43,43 @@ grid = hdf["Region_Overdensity"]
 centres = hdf["Region_Centres"]
 sinds = hdf["Sorted_Indices"][::-1]
 
-# Create lists to store the region data
+# Minimum distance between regions
+r = half_kernel_width / np.cos(np.pi / 4) * 2
 
+# Create lists to store the region data
+region_centres = [centres[sinds[0]], ]
+region_inds = [sinds[0]]
+
+# Loop until we have nregions distinct regions
+ind = 0
+low_ind = 0
+while len(region_inds) < nregions:
+
+    # If we have the 50 highest overdensities and 30
+    # lowest get a random region
+    if len(region_inds) > 80:
+        ind = np.random.randint(low=0, high=sinds.size)
+    elif len(region_inds) > 50:
+        low_ind -= 1
+        ind = low_ind
+    else:
+        ind += 1
+
+    # Get a region
+    region_ind = sinds[ind]
+
+    # Get this regions centre
+    cent = centres[region_ind, :]
+
+    # Build kd tree of current region centers
+    tree = cKDTree(region_centres)
+
+    # Is the region too close to an already selected region?
+    close_regions = tree.query_ball_point(cent, r=r)
+
+    # If not we found no neighbours and can add it to the list
+    if len(close_regions) == 0:
+        region_inds.append(region_ind)
+        region_centres.append(cent)
 
 hdf.close()
