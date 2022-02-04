@@ -28,8 +28,8 @@ zs = [15, 12.26, 10.38, 9.51, 8.7, 7.95, 7.26, 6.63, 6.04, 5.50, 5.0, 4.75,
 step = 0.1
 bin_edges = np.arange(0.00001, 15 + step, step)
 bin_cents = (bin_edges[:-1] + bin_edges[1:]) / 2
-step = 0.04
-log_bin_edges = np.arange(-1.0, 1.0 + step, step)
+step = 0.03
+log_bin_edges = np.arange(-0.6, 0.6 + step, step)
 log_bin_cents = (log_bin_edges[:-1] + log_bin_edges[1:]) / 2
 
 # Set up redshift norm
@@ -40,7 +40,7 @@ fig_log = plt.figure()
 ax_log = fig_log.add_subplot(111)
 ax_log.semilogy()
 
-for num, snap in enumerate(snaps):
+for num, snap in enumerate(reversed(snaps)):
 
        # Define output paths
        metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
