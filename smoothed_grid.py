@@ -61,7 +61,7 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
     # Find the cells and simulation ijk grid references
     # that this rank has to work on
-    rank_cells = np.linspace(0, full_nregion_cells - 1, size + 1, dtype=int)
+    rank_cells = np.linspace(0, full_nregion_cells, size + 1, dtype=int)
 
     print("Rank: %d has %d cells" % (rank,
                                      rank_cells[rank + 1] - rank_cells[rank]))
@@ -214,7 +214,6 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
             # Combine this rank's results into the final array
             ods = hdf_rank["Region_Overdensity"][...]
-            print(other_rank, ods[ods == 0].size)
             final_region_vals[inds] += ods
 
             final_region_stds[inds] += hdf_rank["Region_Overdensity_Stdev"][
@@ -223,6 +222,13 @@ def get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size):
 
             hdf_rank.close()
 
+        sinds = np.argsort(final_region_vals)
+            
+        hdf.create_dataset("Sorted_Indices",
+                           data=sinds,
+                           shape=sinds.shape,
+                           dtype=sinds.dtype,
+                           compression="lzf")
         hdf.create_dataset("Region_Overdensity",
                            data=final_region_vals,
                            shape=final_region_vals.shape,
