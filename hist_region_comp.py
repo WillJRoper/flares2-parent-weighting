@@ -11,11 +11,7 @@ num = int(sys.argv[1])
 
 # Extract the snapshot string
 snaps = [str(i).zfill(4) for i in range(0, 21)]
-zs = [15, 12.26, 10.38, 9.51, 8.7, 7.95, 7.26, 6.63, 6.04, 5.50, 5.0, 4.75,
-      4.5, 4.25, 2.0, 3.75, 3.5, 3.25, 3.0, 2.95, 2.90, 2.85, 2.8, 2.75,
-      2.7, 2.65, 2.6, 2.55, 2.5]
 snap = snaps[num]
-z = zs[num]
 
 # Set up bins
 step = 0.1
@@ -44,7 +40,8 @@ for sim_tag in ["L2800N5040", ]:
                    # Open file
                    hdf = h5py.File(path, "r")
 
-                   grid = hdf["Parent_Grid"][...]
+                   z = hdf.attrs["Parent_Redshift"]
+                   grid = hdf["Region_Overdensity"][...]
 
                    # Get counts for this cell
                    hists[sim_tag + "_" + sim_type + "_" + str(k) + "Mpc"]["log_H"], _ = np.histogram(np.log10(grid), bins=log_bin_edges)
@@ -66,6 +63,7 @@ for sim_tag in ["L2800N5040", ]:
                    # Open file
                    hdf = h5py.File(path, "r")
 
+                   z = hdf.attrs["Parent_Redshift"]
                    grid = hdf["Region_Overdensity"][...]
 
                    hdf.close()

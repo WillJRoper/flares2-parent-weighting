@@ -54,7 +54,7 @@ for num, snap in enumerate(reversed(snaps)):
        # Open file
        hdf = h5py.File(path, "r")
 
-       z = zs[num]
+       z = hdf.attrs["Parent_Redshift"]
        grid = hdf["Region_Overdensity"][...]
 
        print(snap, z)
