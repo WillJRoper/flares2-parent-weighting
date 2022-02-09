@@ -47,7 +47,7 @@ grid = hdf["Region_Overdensity"]
 z = hdf.attrs["Parent_Redshift"]
 # grid_std = hdf["Region_Overdensity_Stdev"][...]
 centres = hdf["Region_Centres"]
-sinds = hdf["Sorted_Indices"][::-1]
+sinds = hdf["Sorted_Indices"][:::][::-1]
 
 print("Selecting at z=%f" % z)
 
