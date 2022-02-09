@@ -58,7 +58,7 @@ print("Selecting %d high density regions, %d low density regions, "
 
 # Minimum distance between regions
 r = half_kernel_width[0] / np.cos(np.pi / 4) * 2
-print(r)
+
 # Create lists to store the region data
 region_centres = [centres[sinds[0]], ]
 region_inds = [sinds[0]]
@@ -83,7 +83,7 @@ while len(region_inds) < nregions:
 
     # Get this regions centre
     cent = centres[region_ind, :]
-    print(cent)
+
     # Build kd tree of current region centers
     tree = cKDTree(region_centres)
 
@@ -94,6 +94,7 @@ while len(region_inds) < nregions:
     if len(close_regions) == 0:
         region_inds.append(region_ind)
         region_centres.append(cent)
+        print("Found %d regions", len(region_inds))
 
 hdf.close()
 
