@@ -93,7 +93,7 @@ while len(region_inds) < nregions:
     if len(close_regions[0]) == 0:
         region_inds.append(region_ind)
         region_centres.append(cent)
-        print("Found %d regions" % len(region_inds))
+        print("Found %d regions" % len(region_inds), end="\r")
 
 hdf.close()
 
@@ -129,8 +129,6 @@ for ind in region_inds:
         # Store these values
         zs[ind].append(z)
         ovdens[ind].append(ovden)
-
-
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
