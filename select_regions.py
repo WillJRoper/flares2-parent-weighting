@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 np.random.seed(42)
 
 # Define all snapshot codes
-snaps = [str(i).zfill(4) for i in range(0, 23)]
+snaps = [str(i).zfill(4) for i in range(0, 20)]
 
 # Define the selection snapshot
 snap = sys.argv[1].zfill(4)
@@ -93,7 +93,7 @@ while len(region_inds) < nregions:
     if len(close_regions[0]) == 0:
         region_inds.append(region_ind)
         region_centres.append(cent)
-        print("Found %d regions", len(region_inds))
+        print("Found %d regions" % len(region_inds))
 
 hdf.close()
 
