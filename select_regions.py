@@ -11,6 +11,9 @@ np.random.seed(42)
 # Define the number of regions needed
 nregions = 400
 
+# Define all snapshot codes
+snaps = [str(i).zfill(4) for i in range(0, 23)]
+
 # Define the selection snapshot
 snap = sys.argv[1].zfill(4)
 
@@ -83,3 +86,38 @@ while len(region_inds) < nregions:
         region_centres.append(cent)
 
 hdf.close()
+
+# ============ Get overdensities for all outputs for these regions ============
+
+# Set up dictionaries to store results
+zs = {}
+ovdens = {}
+
+for ind in region_inds:
+    zs[ind] = []
+    ovdens[ind] = []
+    for snap in snaps:
+        # Define output paths
+        metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
+        outdir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+                 "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/"
+
+        # Define path to file
+        file = "smoothed_" + metafile.split(".")[
+            0] + "_kernel%d.hdf5" % ini_kernel_width
+        path = outdir + file
+
+        # Open file
+        hdf = h5py.File(path, "r")
+
+        # Get the current redshift
+        z = hdf.attrs["Parent_Redshift"]
+
+        # Get the overdensity for this region
+        ovden = hdf["Region_Overdensity"][ind]
+
+        # Store these values
+        zs[ind].append(z)
+        ovdens[ind].append(ovden)
+
+
