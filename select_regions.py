@@ -130,8 +130,9 @@ for ind in region_inds:
         # Store these values
         if first_loop:
             zs.append(z)
-            first_loop = False
         ovdens[ind].append(ovden)
+
+    first_loop = False
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
