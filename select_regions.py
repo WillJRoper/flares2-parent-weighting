@@ -44,9 +44,12 @@ hdf = h5py.File(path, "r")
 kernel_width = hdf.attrs["Kernel_Width"]
 half_kernel_width = kernel_width / 2
 grid = hdf["Region_Overdensity"]
+z = hdf.attrs["Parent_Redshift"]
 # grid_std = hdf["Region_Overdensity_Stdev"][...]
 centres = hdf["Region_Centres"]
 sinds = hdf["Sorted_Indices"][::-1]
+
+print("Selecting at z=%f" % z)
 
 # Minimum distance between regions
 r = half_kernel_width / np.cos(np.pi / 4) * 2
