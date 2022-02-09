@@ -162,7 +162,7 @@ for i, snap in enumerate(snaps):
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-for i in ovdens:
+for i in range(ovdens.size):
     ax.plot(zs, ranks[:, i])
 
 ax.set_ylabel("Rank")
