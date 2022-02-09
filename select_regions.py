@@ -4,8 +4,10 @@ import numpy as np
 import h5py
 from scipy.spatial import cKDTree
 import matplotlib.pyplot as plt
+from flare import plt as flareplt
 
 
+plt.rcParams['axes.grid'] = True
 
 # Set the seed
 np.random.seed(42)
@@ -100,9 +102,9 @@ hdf.close()
 # ============ Get overdensities for all outputs for these regions ============
 
 # Set up dictionaries to store results
-zs = {}
+zs = []
 ovdens = {}
-
+first_loop = True
 for ind in region_inds:
     zs[ind] = []
     ovdens[ind] = []
@@ -127,14 +129,16 @@ for ind in region_inds:
         ovden = hdf["Region_Overdensity"][ind]
 
         # Store these values
-        zs[ind].append(z)
+        if first_loop:
+            zs.append(z)
+            first_loop = False
         ovdens[ind].append(ovden)
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
 
-for i in zs:
-    ax.plot(zs[i], np.log10(ovdens[i]))
+for i in ovdens:
+    ax.plot(zs, np.log10(ovdens[i]))
 
 ax.set_ylabel("$\log_{10}(1 + \delta)$")
 ax.set_xlabel("$z$")
@@ -142,3 +146,29 @@ ax.set_xlabel("$z$")
 fig.savefig("plots/region_select_time_series" + str(ini_kernel_width) + "_"
             + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
 
+plt.close()
+
+# Compute rankings
+ranks = np.zeros((len(snaps), nregions))
+for i, snap in enumerate(snaps):
+    this_snap_ods = []
+    for ind in ovdens:
+        this_snap_ods.append(ovdens[ind][i])
+
+    # Sort this snapshot to get the rank
+    ranks[i, :] = np.sinds(this_snap_ods)
+
+# Plot the ranks
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+for i in ovdens:
+    ax.plot(zs, ranks[:, i])
+
+ax.set_ylabel("Rank")
+ax.set_xlabel("$z$")
+
+fig.savefig("plots/region_rank_time_series" + str(ini_kernel_width) + "_"
+            + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
+
+plt.close()
