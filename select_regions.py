@@ -3,6 +3,8 @@ import sys
 import numpy as np
 import h5py
 from scipy.spatial import cKDTree
+import matplotlib.pyplot as plt
+
 
 
 # Set the seed
@@ -120,4 +122,17 @@ for ind in region_inds:
         zs[ind].append(z)
         ovdens[ind].append(ovden)
 
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+for i in zs:
+    ax.plot(zs[i], np.log10(ovdens[i]))
+
+ax.set_ylabel("$\log_{10}(1 + \delta)$")
+ax.set_xlabel("$z$")
+
+fig.savefig("plots/region_select_time_series" + str(ini_kernel_width) + "_"
+            + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
 
