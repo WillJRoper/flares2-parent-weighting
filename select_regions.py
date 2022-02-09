@@ -89,7 +89,7 @@ while len(region_inds) < nregions:
 
     # Is the region too close to an already selected region?
     close_regions = tree.query_ball_point(np.array([cent, ]), r=r)
-
+    print(close_regions, r)
     # If not we found no neighbours and can add it to the list
     if len(close_regions) == 0:
         region_inds.append(region_ind)
