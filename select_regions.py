@@ -156,7 +156,7 @@ for i, snap in enumerate(snaps):
         this_snap_ods.append(ovdens[ind][i])
 
     # Sort this snapshot to get the rank
-    ranks[i, :] = np.sinds(this_snap_ods)
+    ranks[i, :] = np.argsort(this_snap_ods)
 
 # Plot the ranks
 fig = plt.figure()
