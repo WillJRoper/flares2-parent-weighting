@@ -106,7 +106,6 @@ zs = []
 ovdens = {}
 first_loop = True
 for ind in region_inds:
-    zs[ind] = []
     ovdens[ind] = []
     for snap in snaps:
         # Define output paths
