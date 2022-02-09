@@ -134,7 +134,7 @@ for ind in region_inds:
 
     first_loop = False
 
-fig = plt.figure()
+fig = plt.figure(figsize=(4, 8))
 ax = fig.add_subplot(111)
 
 for i in ovdens:
@@ -159,7 +159,7 @@ for i, snap in enumerate(snaps):
     ranks[i, :] = np.argsort(this_snap_ods)
 
 # Plot the ranks
-fig = plt.figure()
+fig = plt.figure(figsize=(4, 8))
 ax = fig.add_subplot(111)
 
 for i in range(nregions):
