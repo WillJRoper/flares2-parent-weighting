@@ -10,9 +10,6 @@ import matplotlib.pyplot as plt
 # Set the seed
 np.random.seed(42)
 
-# Define the number of regions needed
-nregions = 400
-
 # Define all snapshot codes
 snaps = [str(i).zfill(4) for i in range(0, 23)]
 
@@ -27,6 +24,12 @@ sim_type = sys.argv[3]
 
 # Define initial kernel width
 ini_kernel_width = int(sys.argv[4])
+
+# Define the number of high and low density regions we want
+nhigh, nlow = int(sys.argv[5]), int(sys.argv[6])
+
+# Define the number of regions needed
+nregions = int(sys.argv[7])
 
 # Define output paths
 metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
@@ -49,7 +52,9 @@ z = hdf.attrs["Parent_Redshift"]
 centres = hdf["Region_Centres"]
 sinds = hdf["Sorted_Indices"][...][::-1]
 
-print("Selecting at z=%f" % z)
+print("Selecting %d high density regions, %d low density regions, "
+      "and %d random regions at z=%f" % (nhigh, nlow,
+                                         nregions - nhigh - nlow, z))
 
 # Minimum distance between regions
 r = half_kernel_width / np.cos(np.pi / 4) * 2
@@ -65,9 +70,9 @@ while len(region_inds) < nregions:
 
     # If we have the 50 highest overdensities and 30
     # lowest get a random region
-    if len(region_inds) > 80:
+    if len(region_inds) > nhigh + nlow:
         ind = np.random.randint(low=0, high=sinds.size)
-    elif len(region_inds) > 50:
+    elif len(region_inds) > nhigh:
         low_ind -= 1
         ind = low_ind
     else:
@@ -83,7 +88,7 @@ while len(region_inds) < nregions:
     tree = cKDTree(region_centres)
 
     # Is the region too close to an already selected region?
-    close_regions = tree.query_ball_point(cent, r=r)
+    close_regions = tree.query_ball_point(np.array([cent, ]), r=r)
 
     # If not we found no neighbours and can add it to the list
     if len(close_regions) == 0:
