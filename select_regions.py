@@ -14,6 +14,8 @@ np.random.seed(42)
 
 # Define all snapshot codes
 snaps = [str(i).zfill(4) for i in range(0, 20)]
+ind_z5 = 10  # index of the z=5 snapshot
+ind_z10 = 2  # index of the z=10 snapshot
 
 # Define the selection snapshot
 snap = sys.argv[1].zfill(4)
@@ -105,8 +107,6 @@ hdf.close()
 zs = []
 ovdens = {}
 first_loop = True
-ind_z5 = 0  # index of the z=5 snapshot
-ind_z10 = 0  # index of the z=10 snapshot
 for ind in region_inds:
     ovdens[ind] = []
     for isnap, snap in enumerate(snaps):
@@ -125,12 +125,6 @@ for ind in region_inds:
 
         # Get the current redshift
         z = hdf.attrs["Parent_Redshift"]
-
-        if z == 5:
-            ind_z5 = isnap
-
-        if z == 10.38:
-            ind_z10 = isnap
 
         # Get the overdensity for this region
         ovden = hdf["Region_Overdensity"][ind]
@@ -182,15 +176,15 @@ fig.savefig("plots/region_rank_time_series" + str(ini_kernel_width) + "_"
 plt.close()
 
 # Calculate the maximum delta rank
-delta_rank = ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]
+delta_rank = np.max(np.abs(ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]))
 
 # Plot the ranks
 fig = plt.figure(figsize=(4, 8))
 ax = fig.add_subplot(111)
 
-ax.scatter(delta_rank, ranks[ind_z5, :])
+ax.scatter(ranks[ind_z5, :], delta_rank)
 
-ax.set_ylabel("$\Delta$(Rank)$_{z=10-5}$")
+ax.set_ylabel("$\mathrm{max}(|\Delta$(Rank)$_{z=10-5}|)$")
 ax.set_xlabel("Rank$_{z=5}$")
 
 fig.savefig("plots/region_deltarank_" + str(ini_kernel_width) + "_"
