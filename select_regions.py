@@ -176,7 +176,7 @@ fig.savefig("plots/region_rank_time_series" + str(ini_kernel_width) + "_"
 plt.close()
 
 # Calculate the maximum delta rank
-delta_rank = np.max(np.abs(ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]))
+delta_rank = np.max(np.abs(ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]), axis=0)
 
 # Plot the ranks
 fig = plt.figure(figsize=(4, 8))
