@@ -105,10 +105,9 @@ hdf.close()
 
 # Set up dictionaries to store results
 zs = []
-ovdens = {}
+ovdens = np.zeros((len(snaps), nregions))
 first_loop = True
 for ind in region_inds:
-    ovdens[ind] = []
     for isnap, snap in enumerate(snaps):
         # Define output paths
         metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
@@ -132,7 +131,7 @@ for ind in region_inds:
         # Store these values
         if first_loop:
             zs.append(z)
-        ovdens[ind].append(ovden)
+        ovdens[isnap, ind] = ovden
 
     first_loop = False
 
@@ -140,7 +139,7 @@ fig = plt.figure(figsize=(4, 8))
 ax = fig.add_subplot(111)
 
 for i in ovdens:
-    ax.plot(zs, np.log10(ovdens[i]))
+    ax.plot(zs, np.log10(ovdens[:, i]))
 
 ax.set_ylabel("$\log_{10}(1 + \delta)$")
 ax.set_xlabel("$z$")
@@ -154,14 +153,9 @@ plt.close()
 ranks = np.zeros((len(snaps), nregions))
 ovden_grid = np.zeros((len(snaps), nregions))
 for i, snap in enumerate(snaps):
-    this_snap_ods = []
-    for ind in ovdens:
-        this_snap_ods.append(ovdens[ind][i])  # append the value for this region (ind) and snapshot (i)
-
-        ovden_grid[i, :] = ovdens[ind][i]
 
     # Sort this snapshot to get the rank
-    ranks[i, :] = np.argsort(this_snap_ods)
+    ranks[i, :] = np.argsort(ovden_grid[i, :])
 
 # Plot the ranks
 fig = plt.figure(figsize=(4, 8))
@@ -179,7 +173,7 @@ fig.savefig("plots/region_rank_time_series" + str(ini_kernel_width) + "_"
 plt.close()
 
 # Calculate the maximum delta rank
-delta_rank = np.max(np.abs(ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]), axis=0)
+delta_rank = ranks[ind_z10, :] - ranks[ind_z5, :]
 delta_ovdens = ovden_grid[ind_z10, :] - ovden_grid[ind_z5, :]
 
 # Plot the ranks
@@ -188,7 +182,7 @@ ax = fig.add_subplot(111)
 
 ax.scatter(ranks[ind_z5, :], delta_rank)
 
-ax.set_ylabel("$\mathrm{max}(|\Delta$(Rank)$_{z=10-5}|)$")
+ax.set_ylabel("$\Delta$(Rank)$_{z=10-5}$")
 ax.set_xlabel("Rank$_{z=5}$")
 
 fig.savefig("plots/region_deltarank_" + str(ini_kernel_width) + "_"
