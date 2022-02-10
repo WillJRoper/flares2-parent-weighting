@@ -129,7 +129,7 @@ for ind in region_inds:
         if z == 5:
             ind_z5 = isnap
 
-        if z == 10:
+        if z == 10.38:
             ind_z10 = isnap
 
         # Get the overdensity for this region
