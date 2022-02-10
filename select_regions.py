@@ -152,10 +152,13 @@ plt.close()
 
 # Compute rankings
 ranks = np.zeros((len(snaps), nregions))
+ovden_grid = np.zeros((len(snaps), nregions))
 for i, snap in enumerate(snaps):
     this_snap_ods = []
     for ind in ovdens:
         this_snap_ods.append(ovdens[ind][i])  # append the value for this region (ind) and snapshot (i)
+
+        ovden_grid[i, :] = ovdens[ind][i]
 
     # Sort this snapshot to get the rank
     ranks[i, :] = np.argsort(this_snap_ods)
@@ -177,9 +180,10 @@ plt.close()
 
 # Calculate the maximum delta rank
 delta_rank = np.max(np.abs(ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]), axis=0)
+delta_ovdens = ovden_grid[ind_z10, :] - ovden_grid[ind_z5, :]
 
 # Plot the ranks
-fig = plt.figure(figsize=(4, 8))
+fig = plt.figure(figsize=(4, 4))
 ax = fig.add_subplot(111)
 
 ax.scatter(ranks[ind_z5, :], delta_rank)
@@ -188,6 +192,20 @@ ax.set_ylabel("$\mathrm{max}(|\Delta$(Rank)$_{z=10-5}|)$")
 ax.set_xlabel("Rank$_{z=5}$")
 
 fig.savefig("plots/region_deltarank_" + str(ini_kernel_width) + "_"
+            + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
+
+plt.close()
+
+# Plot the ranks
+fig = plt.figure(figsize=(4, 4))
+ax = fig.add_subplot(111)
+
+ax.scatter(ovden_grid[ind_z5, :], delta_ovdens)
+
+ax.set_ylabel("$\Delta(\log_{10}(1 + \delta))_{z=10-5}$")
+ax.set_xlabel("$\log_{10}(1 + \delta))_{z=5}$")
+
+fig.savefig("plots/region_deltaovden_" + str(ini_kernel_width) + "_"
             + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
 
 plt.close()
