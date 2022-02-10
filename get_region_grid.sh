@@ -22,8 +22,9 @@ source activate flares-env
 
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
-mpirun -np 1024 python smoothed_grid.py $i L2800N5040 HYDRO
-mpirun -np 1024 python smoothed_grid.py $i L2800N5040 DMO
+#mpirun -np 1024 python smoothed_grid.py $i L2800N5040 HYDRO
+#mpirun -np 1024 python smoothed_grid.py $i L2800N5040 DMO
+mpirun -np 1024 python smoothed_grid.py $i L5600N5040 DMO
 
 source deactivate
 
