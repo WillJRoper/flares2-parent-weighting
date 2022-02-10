@@ -105,9 +105,11 @@ hdf.close()
 zs = []
 ovdens = {}
 first_loop = True
+ind_z5 = 0  # index of the z=5 snapshot
+ind_z10 = 0  # index of the z=10 snapshot
 for ind in region_inds:
     ovdens[ind] = []
-    for snap in snaps:
+    for isnap, snap in enumerate(snaps):
         # Define output paths
         metafile = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s.hdf5" % snap
         outdir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
@@ -123,6 +125,12 @@ for ind in region_inds:
 
         # Get the current redshift
         z = hdf.attrs["Parent_Redshift"]
+
+        if z == 5:
+            ind_z5 = isnap
+
+        if z == 10:
+            ind_z10 = isnap
 
         # Get the overdensity for this region
         ovden = hdf["Region_Overdensity"][ind]
@@ -153,7 +161,7 @@ ranks = np.zeros((len(snaps), nregions))
 for i, snap in enumerate(snaps):
     this_snap_ods = []
     for ind in ovdens:
-        this_snap_ods.append(ovdens[ind][i])
+        this_snap_ods.append(ovdens[ind][i])  # append the value for this region (ind) and snapshot (i)
 
     # Sort this snapshot to get the rank
     ranks[i, :] = np.argsort(this_snap_ods)
@@ -169,6 +177,23 @@ ax.set_ylabel("Rank")
 ax.set_xlabel("$z$")
 
 fig.savefig("plots/region_rank_time_series" + str(ini_kernel_width) + "_"
+            + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
+
+plt.close()
+
+# Calculate the maximum delta rank
+delta_rank = ranks[ind_z10: ind_z5 + 1, :] - ranks[ind_z5, :]
+
+# Plot the ranks
+fig = plt.figure(figsize=(4, 8))
+ax = fig.add_subplot(111)
+
+ax.scatter(delta_rank, ranks[ind_z5, :])
+
+ax.set_ylabel("$\Delta$(Rank)$_{z=10-5}$")
+ax.set_xlabel("Rank$_{z=5}$")
+
+fig.savefig("plots/region_deltarank_" + str(ini_kernel_width) + "_"
             + sim_tag + "_" + sim_type + ".png", bbox_inches="tight")
 
 plt.close()
