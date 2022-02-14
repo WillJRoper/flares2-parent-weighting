@@ -343,7 +343,11 @@ if __name__ == "__main__":
     outfile_without_rank = "overdensity_" + sim_tag + "_" + sim_type + "_snap%s_" % snap
 
     # Define output paths
-    out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+    # For cosma7 (now read only)
+    # out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+    #           "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
+    # For cosma8
+    out_dir = "/cosma8/data/dp004/FLARES-2/Parent/" \
               "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
     if not os.path.isdir(out_dir) and rank == 0:
         os.mkdir(out_dir)
