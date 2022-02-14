@@ -272,8 +272,12 @@ if __name__ == "__main__":
     snap = snaps[num]
 
     # Define output paths
-    outdir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
-             "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/"
+    # For cosma7 (now read only)
+    # out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
+    #           "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
+    # For cosma8
+    out_dir = "/cosma8/data/dp004/dc-rope1/FLARES-2/Parent/" \
+              "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
 
     # Run smoothing
     ini_kernel_width = 25  # in cMpc
