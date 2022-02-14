@@ -347,7 +347,7 @@ if __name__ == "__main__":
     # out_dir = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
     #           "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
     # For cosma8
-    out_dir = "/cosma8/data/dp004/FLARES-2/Parent/" \
+    out_dir = "/cosma8/data/dp004/dc-rope1/FLARES-2/Parent/" \
               "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
     if not os.path.isdir(out_dir) and rank == 0:
         os.mkdir(out_dir)
