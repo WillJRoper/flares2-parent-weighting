@@ -10,13 +10,13 @@
 #SBATCH --exclusive
 #SBATCH -t 5:00:00
 
-module purge
-#load the modules used to build your program.
-module load python/3.9.1-C7 gnu_comp/11.1.0 openmpi/4.1.1 ucx/1.10.1
-
 cd /cosma8/data/dp004/dc-rope1/FLARES-2/flares2-parent-weighting
 
 source ../flares2-env/bin/activate
+
+module purge
+#load the modules used to build your program.
+module load python/3.9.1-C7 gnu_comp/11.1.0 openmpi/4.1.1 ucx/1.10.1
 
 i=$(($SLURM_ARRAY_TASK_ID - 1))
 
