@@ -8,7 +8,7 @@
 #SBATCH -p cosma8
 #SBATCH -A dp004
 #SBATCH --exclusive
-#SBATCH -t 5:00:00
+#SBATCH -t 24:00:00
 
 module purge
 #load the modules used to build your program.
