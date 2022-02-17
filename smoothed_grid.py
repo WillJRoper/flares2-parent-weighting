@@ -275,7 +275,7 @@ if __name__ == "__main__":
     #           "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
     # For cosma8
     out_dir = "/cosma8/data/dp004/dc-rope1/FLARES-2/Parent/" \
-              "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap
+              "overdensity_gridding/" + sim_tag + "/" + sim_type + "/snap_" + snap + "/"
 
     # Run smoothing
     ini_kernel_width = 25  # in cMpc
