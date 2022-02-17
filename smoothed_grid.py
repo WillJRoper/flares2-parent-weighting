@@ -281,4 +281,4 @@ if __name__ == "__main__":
 
     # Run smoothing
     ini_kernel_width = 25  # in cMpc
-    get_smoothed_grid(snap, ini_kernel_width, outdir, rank, size)
+    get_smoothed_grid(snap, ini_kernel_width, out_dir, rank, size)
