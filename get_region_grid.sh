@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -l
 #SBATCH --ntasks 1024
 #SBATCH --array=1-20%10
 #SBATCH --cpus-per-task=1
