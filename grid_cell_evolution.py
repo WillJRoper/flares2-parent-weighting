@@ -8,7 +8,7 @@ plt.rcParams['axes.grid'] = True
 
 
 # Define the snapshot strings
-snaps = [str(i).zfill(4) for i in range(0, 21)]
+snaps = [str(i).zfill(4) for i in range(0, 20)]
 
 slopes = {}
 odens = {}
