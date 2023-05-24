@@ -48,6 +48,8 @@ for snap in snaps:
         odens[snap] = grid.flatten()
         zs[snap] = z
 
+    prev_grid = grid
+
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
@@ -59,7 +61,6 @@ for snap in zs.keys():
     bin_cents = (bins[1:] + bins[:-1]) / 2
 
     ax.plot(bin_cents, H, color=cmap(norm(z)))
-
 
 ax2 = fig.add_axes([0.95, 0.1, 0.015, 0.8])
 cb1 = mpl.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm)
