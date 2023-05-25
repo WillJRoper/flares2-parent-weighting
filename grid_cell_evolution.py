@@ -58,16 +58,16 @@ ax.semilogy()
 
 for snap in zs.keys():
 
-    H, bins = np.histogram(slopes[snap], bins=50)
+    H, bins = np.histogram(slopes[snap] / odens[snap], bins=50)
     bin_cents = (bins[1:] + bins[:-1]) / 2
 
-    ax.plot(bin_cents, H, color=cmap(norm(z)))
+    ax.plot(bin_cents, H, color=cmap(norm(zs[snap])))
 
 ax2 = fig.add_axes([0.95, 0.1, 0.015, 0.8])
 cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm)
 cb1.set_label("$z$")
 
-ax.set_xlabel("$\Delta_B - \Delta_A$")
+ax.set_xlabel("$(\Delta_B - \Delta_A) / \Delta_B$")
 ax.set_ylabel("$N$")
 
 fig.savefig("plots/delta_overdensity_z_L2800N5040_DMO.png",
