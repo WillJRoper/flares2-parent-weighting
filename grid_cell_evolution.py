@@ -64,7 +64,7 @@ for snap in zs.keys():
     ax.plot(bin_cents, H, color=cmap(norm(z)))
 
 ax2 = fig.add_axes([0.95, 0.1, 0.015, 0.8])
-cb1 = mpl.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm)
+cb1 = mpl.colorbar.ColorbarBase(ax2, cmap=cmap, norm=norm)
 cb1.set_label("$z$")
 
 ax.set_xlabel("$\Delta_B - \Delta_A$")
