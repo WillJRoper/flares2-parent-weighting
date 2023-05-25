@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as cm
+import matplotlib as mpl
 from flare import plt as flareplt
 import h5py
 import sys
