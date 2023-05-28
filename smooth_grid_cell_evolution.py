@@ -83,7 +83,7 @@ for snap in zs.keys():
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ax.hexbin(ovdens[snap][~np.isnan(slopes[snap])],
+    ax.hexbin(odens[snap][~np.isnan(slopes[snap])],
               slopes[snap][~np.isnan(slopes[snap])],
               mincnt=1, yscale="log",
               linewidth=0.2, cmap="viridis")
