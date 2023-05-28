@@ -54,7 +54,7 @@ for snap in snaps:
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
-ax.loglog()
+ax.semilogy()
 
 for snap in zs.keys():
 
@@ -85,7 +85,7 @@ for snap in zs.keys():
 
     ax.hexbin(odens[snap][~np.isnan(slopes[snap])],
               slopes[snap][~np.isnan(slopes[snap])],
-              mincnt=1, yscale="log",
+              mincnt=1,
               linewidth=0.2, cmap="viridis")
 
     cb1 = fig.colorbar()
