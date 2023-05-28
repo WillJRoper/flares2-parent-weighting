@@ -27,7 +27,7 @@ for snap in snaps:
     print(snap)
 
     # Define path to file
-    metafile = "overdensity_L2800N5040_DMO_snap%s.hdf5" % snap
+    metafile = "smoothed_overdensity_L2800N5040_DMO_snap%s_kernel25.hdf5" % snap
     path = "/cosma7/data/dp004/FLARES/FLARES-2/Parent/" \
         "overdensity_gridding/L2800N5040/DMO/snap_" + snap + "/" + metafile
 
@@ -72,7 +72,7 @@ cb1.set_label("$z$")
 ax.set_xlabel("$\Delta_B / \Delta_A$")
 ax.set_ylabel("$N$")
 
-fig.savefig("plots/delta_overdensity_z_L2800N5040_DMO.png",
+fig.savefig("plots/smoothed25_delta_overdensity_z_L2800N5040_DMO.png",
             bbox_inches="tight")
 plt.close(fig)
 
@@ -94,6 +94,6 @@ for snap in zs.keys():
     ax.set_ylabel("$\Delta_B / \Delta_A$")
     ax.set_xlabel("$\log_{10}(\Delta_B + 1)$")
 
-    fig.savefig("plots/delta_overdensity_hex_L2800N5040_DMO_%s.png" % snap,
+    fig.savefig("plots/smoothed25_delta_overdensity_hex_L2800N5040_DMO_%s.png" % snap,
                 bbox_inches="tight")
     plt.close(fig)
