@@ -12,7 +12,7 @@ plt.rcParams['axes.grid'] = True
 def distributed_calc(snap):
 
     # Define the previous snapshot
-    prev_snap = str(int(snap) - 1).zfill(4)
+    prev_snap = str(int(snap) + 1).zfill(4)
 
     print(prev_snap, "->", snap)
 
@@ -75,7 +75,7 @@ def distributed_calc(snap):
     return z, snap, slopes, odens, H, bin_cents
 
 # Define the snapshot strings
-snaps = [str(i).zfill(4) for i in range(19, -1, -1)]
+snaps = [str(i).zfill(4) for i in range(0, 19)]
 
 slopes = {}
 odens = {}
