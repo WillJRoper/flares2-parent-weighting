@@ -37,9 +37,8 @@ for snap in snaps:
     print(hdf.keys())
     print(hdf.attrs.keys())
 
-    mean_density = hdf["Parent"].attrs["Mean_Density"]
-    z = hdf["Parent"].attrs["Redshift"]
-    grid = (hdf["Parent_Grid"][...] / mean_density) - 1
+    z = hdf.attrs["Parent_Redshift"]
+    grid = hdf["Region_Overdensity"][...]
 
     hdf.close()
 
