@@ -85,12 +85,12 @@ for snap in zs.keys():
     fig = plt.figure()
     ax = fig.add_subplot(111)
 
-    ax.hexbin(odens[snap][~np.isnan(slopes[snap])],
-              slopes[snap][~np.isnan(slopes[snap])],
-              mincnt=1, yscale="log",
-              linewidth=0.2, cmap="viridis")
+    mappable = ax.hexbin(odens[snap][~np.isnan(slopes[snap])],
+                         slopes[snap][~np.isnan(slopes[snap])],
+                         mincnt=1, yscale="log",
+                         linewidth=0.2, cmap="viridis")
 
-    cb1 = fig.colorbar()
+    cb1 = fig.colorbar(mappable)
     cb1.set_label("$N$")
 
     ax.set_ylabel("$\Delta_B / \Delta_A$")
