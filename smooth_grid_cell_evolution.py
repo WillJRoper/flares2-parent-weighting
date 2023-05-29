@@ -45,7 +45,7 @@ def distributed_calc(snap):
     delta = grid - prev_grid
     
     slopes = delta.flatten()
-    odens = grid.flatten()
+    odens = np.log10(grid.flatten())
 
     # Plot the distribution
     fig = plt.figure()
