@@ -45,7 +45,7 @@ def distributed_calc(snap):
     delta = grid - prev_grid
     
     slopes = delta.flatten()
-    odens = np.log10(grid.flatten() + 1)
+    odens = grid.flatten()
 
     # Plot the distribution
     fig = plt.figure()
@@ -75,7 +75,7 @@ def distributed_calc(snap):
     return z, snap, slopes, odens, H, bin_cents
 
 # Define the snapshot strings
-snaps = [str(i).zfill(4) for i in range(1, 19)]
+snaps = [str(i).zfill(4) for i in range(1, 20)]
 
 slopes = {}
 odens = {}
