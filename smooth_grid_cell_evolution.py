@@ -34,6 +34,9 @@ for snap in snaps:
     # Open file
     hdf = h5py.File(path, "r")
 
+    print(hdf.keys())
+    print(hdf.attrs.keys())
+
     mean_density = hdf["Parent"].attrs["Mean_Density"]
     z = hdf["Parent"].attrs["Redshift"]
     grid = (hdf["Parent_Grid"][...] / mean_density) - 1
